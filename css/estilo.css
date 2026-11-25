@@ -270,7 +270,8 @@ button.secundario,
 
 .resultado {
   margin-top: 1.5rem;
-  padding: 1rem;
+  /* folga lateral com teto pela largura da tela (texto a 200% em 320px) */
+  padding: 1rem min(1rem, 3vw);
   border-radius: 0.5rem;
   border: 2px solid var(--alerta-texto);
   background: var(--alerta-fundo);
@@ -282,7 +283,7 @@ button.secundario,
 }
 
 .resultado ul {
-  padding-left: 1.25rem;
+  padding-left: min(1.25rem, 5vw);
 }
 
 .resultado li + li {
@@ -328,9 +329,12 @@ a {
 
 /* telas maiores: botões lado a lado */
 @media (min-width: 36rem) {
-  .escolha,
   .acoes {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .escolha {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -345,7 +349,7 @@ a {
   font-size: 1.2rem;
   font-weight: 700;
   margin-top: 0;
-  padding: 0.75rem;
+  padding: 0.75rem min(0.75rem, 3vw);
   border: 3px solid var(--alerta-texto);
   border-radius: 0.5rem;
   background: var(--fundo);

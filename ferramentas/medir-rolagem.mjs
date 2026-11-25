@@ -1,5 +1,7 @@
 // Mede rolagem lateral das páginas num navegador de verdade (Edge ou Chrome,
-// sem janela), a 375 e 320 px, com o texto a 100% e a 200%.
+// sem janela), a 375 e 320 px, com o texto a 100% e a 200%. Também conta as
+// palavras partidas entre duas linhas (com ou sem hífen) e mede o resultado
+// do conferidor aberto (link e anúncio com alerta forte).
 //
 //   node ferramentas/medir-rolagem.mjs
 //
@@ -21,6 +23,51 @@ const RAIZ = fileURLToPath(new URL("..", import.meta.url));
 const PAGINAS = ["index.html", "black-friday.html", "ja-cai.html", "golpes.html"];
 const LARGURAS = [375, 320];
 const ESCALAS = [1, 2]; // texto a 100% e a 200%
+
+// Cenários extras: a página com o resultado aberto (o texto mais apertado).
+const CENARIOS = [
+  ...PAGINAS.map((pagina) => ({ pagina, nome: pagina, js: "" })),
+  {
+    pagina: "index.html",
+    nome: "index+resultado",
+    js: `document.getElementById("aba-link")?.click();
+      const l = document.getElementById("link"), a = document.getElementById("anuncio");
+      if (l && a) {
+        l.value = "magalu-blackfriday-90off.shop";
+        a.value = "Smart TV 65 polegadas por R$ 890. Pagamento somente via Pix. Últimas unidades, acaba hoje!";
+        document.querySelector("#form-link button[type=submit]").click();
+      }`,
+  },
+];
+
+// Conta palavras do conteúdo que começam numa linha e terminam em outra.
+// "com hífen": a quebra cai num hífen que já está na palavra (e-mail);
+// "sem hífen": a palavra foi partida no meio das letras.
+const CONTAR_QUEBRADAS = `(() => {
+  let n = 0, comHifen = 0, semHifen = 0;
+  const exemplos = [];
+  const andar = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  while (andar.nextNode()) {
+    const no = andar.currentNode;
+    if (!no.parentElement || no.parentElement.closest("[hidden], .pular, script, style")) continue;
+    for (const m of no.data.matchAll(/[\\p{L}\\p{N}-]{4,}/gu)) {
+      const r = document.createRange();
+      r.setStart(no, m.index);
+      r.setEnd(no, m.index + m[0].length);
+      const topos = new Set([...r.getClientRects()].map((q) => Math.round(q.top)));
+      if (topos.size < 2) continue;
+      n++;
+      // onde a linha muda: a letra antes dela é um hífen da própria palavra?
+      const topoDe = (i) => { const c = document.createRange(); c.setStart(no, m.index + i); c.setEnd(no, m.index + i + 1); return Math.round(c.getBoundingClientRect().top); };
+      const primeiro = topoDe(0);
+      let i = 1;
+      while (i < m[0].length && topoDe(i) === primeiro) i++;
+      if (m[0][i - 1] === "-") comHifen++;
+      else { semHifen++; if (exemplos.length < 5) exemplos.push(m[0]); }
+    }
+  }
+  return { n, comHifen, semHifen, exemplos };
+})()`;
 
 const CANDIDATOS = [
   process.env.NAVEGADOR,
@@ -86,7 +133,7 @@ const avaliar = async (expressao) => (await cmd("Runtime.evaluate", { expression
 
 await cmd("Page.enable");
 let falhas = 0;
-for (const pagina of PAGINAS) {
+for (const { pagina, nome, js } of CENARIOS) {
   for (const largura of LARGURAS) {
     for (const escala of ESCALAS) {
       await cmd("Emulation.setDeviceMetricsOverride", { width: largura, height: 800, deviceScaleFactor: 1, mobile: true });
@@ -94,11 +141,17 @@ for (const pagina of PAGINAS) {
       await esperar(800);
       // texto a 200%: dobra o tamanho da letra da página (o CSS usa 125% = 20px)
       if (escala !== 1) await avaliar(`document.documentElement.style.fontSize = "${125 * escala}%"`);
-      await esperar(200);
+      if (js) await avaliar(js);
+      await esperar(300);
       const m = await avaliar("({ s: document.documentElement.scrollWidth, c: document.documentElement.clientWidth })");
+      const q = await avaliar(CONTAR_QUEBRADAS);
       const ok = m.s <= m.c;
       if (!ok) falhas++;
-      console.log(`${ok ? "ok  " : "ROLA"} ${pagina.padEnd(18)} ${largura}px texto ${escala * 100}%: scrollWidth ${m.s} / largura ${m.c}`);
+      console.log(
+        `${ok ? "ok  " : "ROLA"} ${nome.padEnd(18)} ${largura}px texto ${escala * 100}%: scrollWidth ${m.s} / largura ${m.c}` +
+          ` · palavras partidas: ${q.n} (no hífen da palavra: ${q.comHifen}; no meio: ${q.semHifen}` +
+          `${q.exemplos.length ? ` — ${q.exemplos.join(", ")}` : ""})`,
+      );
     }
   }
 }

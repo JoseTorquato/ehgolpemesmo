@@ -27,6 +27,12 @@ export const PASSOS_GERAIS = [
 ];
 
 export const VAZIO = "Cole a mensagem ou a linha do boleto no campo acima e toque em Conferir.";
+export const VAZIO_LINK = "Cole o link ou o texto do anúncio nos campos acima e toque em Conferir.";
 
 export const COLAR_SEM_PERMISSAO =
   "Não foi possível colar automaticamente. Toque e segure no campo e escolha Colar.";
+
+// Link ou anúncio (Black Friday)
+export const RESUMO_FORTE_LINK = "Cuidado: este link ou anúncio tem sinais fortes de golpe.";
+export const SEM_ENDERECO =
+  "Não encontramos um endereço de site no campo do link. Confira se colou o link inteiro.";

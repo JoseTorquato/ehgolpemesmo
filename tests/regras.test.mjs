@@ -9,15 +9,24 @@ import assert from "node:assert/strict";
 
 import { analisar, validar } from "../js/motor.js";
 import { REGRAS, SINAIS } from "../js/regras.js";
+import { analisarMensagem } from "../js/anuncio.js";
 
 const BASE = validar(SINAIS, REGRAS);
 const rodar = (texto) => analisar(texto, BASE);
 const nivel = (texto) => rodar(texto).nivel;
 
+const ORDEM = { nenhum: 0, atencao: 1, forte: 2 };
+
 function esperar(casos, esperado) {
   for (const msg of casos) {
     const r = rodar(msg);
     assert.equal(r.nivel, esperado, `${msg}\n→ sinais ${JSON.stringify(r.sinais)} · ${r.encontrados.map((e) => e.id)}`);
+    // a página roda também os links e as regras de anúncio no campo de
+    // mensagem: isso nunca pode baixar o nível, nem pôr alerta forte onde
+    // as regras da mensagem não acharam nada
+    const pagina = analisarMensagem(msg, BASE);
+    assert.ok(ORDEM[pagina.nivel] >= ORDEM[esperado], `campo de mensagem baixou o nível: ${msg}`);
+    if (esperado === "nenhum") assert.notEqual(pagina.nivel, "forte", `alerta forte no campo de mensagem: ${msg}`);
   }
 }
 
