@@ -36,7 +36,7 @@ node --test
 
 | arquivo | o que é |
 |---|---|
-| `index.html`, `ja-cai.html`, `black-friday.html` | as páginas |
+| `index.html`, `ja-cai.html`, `black-friday.html`, `golpes.html` | as páginas |
 | `css/estilo.css` | estilo mobile first: letra base de 20px, contraste AA, botões de 60px |
 | `js/regras.js` | **dados**: sinais e regras dos golpes (formato descrito em `js/motor.js`) |
 | `js/motor.js` | motor: normaliza o texto, valida as regras e procura os sinais |
@@ -52,12 +52,13 @@ node --test
 
 - **Mensagens:** regras do falso parente (9 sinais; alerta forte só com combinação) e, mais curtas, falsa central, Pix "por engano" com devolução, empréstimo com taxa antecipada, cobrança falsa com link e pedido de código. Os roteiros vêm de fontes oficiais (MJSP/Febraban, Polícia Civil de Goiás, BCB, WhatsApp); os padrões de texto são derivados deles. `tests/regras.test.mjs` traz as mensagens de golpe e as mensagens normais usadas para medir falso alarme.
 - **Boleto:** 47 dígitos (cobrança) e 48 (arrecadação), dígitos verificadores, banco pela lista do Banco Central embarcada (`dados/ParticipantesSTR.csv`, baixada em 24/11/2026, gerada em `js/dados/bancos.js` por `node ferramentas/gerar-bancos.mjs`), valor e vencimento provável (estimativa, porque o fator de vencimento recomeçou em 22/02/2025). O resultado sempre manda conferir o nome do beneficiário no aplicativo do banco.
+- **Golpes comuns (`golpes.html`):** 11 cards curtos (como funciona / sinais / o que fazer) e 4 dicas para a família. Textos próprios, a partir de `pesquisa-catalogo.md` (25/11/2026): só fatos confirmados; sinal só de imprensa entra sem número; o que não foi confirmado fica de fora. Todo número traz a fonte e a data no próprio card (`tests/golpes.test.mjs`).
 - **Já caí, e agora?:** só passos confirmados em fonte oficial, com a fonte em cada parte.
 - **Black Friday: antes de comprar:** checklist de sete cuidados, só com orientação de fonte primária (CERT.br, NIC.br, Febraban, Procons, Serasa, MJSP), e link para a lista "Evite esses Sites" do Procon-SP, sem republicar a lista.
 
 ## Rolagem lateral (texto a 200%)
 
-`node ferramentas/medir-rolagem.mjs` abre as 3 páginas num Edge ou Chrome sem janela, a 375 e 320 px, com o texto a 100% e a 200%, e falha se alguma rolar para o lado. Não entra no `node --test` porque precisa do navegador; o teste `tests/acessibilidade.test.mjs` confere no CSS que as folgas laterais têm teto pela largura da tela.
+`node ferramentas/medir-rolagem.mjs` abre as páginas num Edge ou Chrome sem janela, a 375 e 320 px, com o texto a 100% e a 200%, e falha se alguma rolar para o lado. Não entra no `node --test` porque precisa do navegador; o teste `tests/acessibilidade.test.mjs` confere no CSS que as folgas laterais têm teto pela largura da tela.
 
 ## Imagem de prévia do link
 

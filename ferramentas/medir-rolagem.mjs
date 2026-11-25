@@ -18,7 +18,7 @@ import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const RAIZ = fileURLToPath(new URL("..", import.meta.url));
-const PAGINAS = ["index.html", "black-friday.html", "ja-cai.html"];
+const PAGINAS = ["index.html", "black-friday.html", "ja-cai.html", "golpes.html"];
 const LARGURAS = [375, 320];
 const ESCALAS = [1, 2]; // texto a 100% e a 200%
 

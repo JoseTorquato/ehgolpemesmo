@@ -37,6 +37,13 @@ const FONTES_OFICIAIS = [
   "sistemas.procon.sp.gov.br",
   "prefeitura.pbh.gov.br",
   "www.pmvc.ba.gov.br",
+  // catálogo de golpes (golpes.html): polícias, Correios e imprensa citada
+  "goias.gov.br",
+  "www.parana.pr.gov.br",
+  "www.correios.com.br",
+  "agenciabrasil.ebc.com.br",
+  "www.folhape.com.br",
+  "canaltech.com.br",
 ];
 
 // O endereço do próprio site (prévia de link e convite do WhatsApp) e o
