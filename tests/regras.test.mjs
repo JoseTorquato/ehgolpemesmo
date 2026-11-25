@@ -391,3 +391,14 @@ test("pagar por mim: pedido e impedimento em mensagens diferentes, coladas junta
   for (const msg of conversa.slice(0, 1)) assert.equal(nivel(msg), "nenhum", msg);
   assert.equal(nivel(conversa.join("\n")), "forte");
 });
+
+test("valor alto não casa CPF, CNPJ nem protocolo com pontos", async () => {
+  const { sinaisPresentes, normalizar } = await import("../js/motor.js");
+  const tem = (t) => sinaisPresentes(normalizar(t), SINAIS).has("valor-alto");
+  assert.ok(tem("o valor é 2.100,00"));
+  assert.ok(tem("R$ 1.850"));
+  assert.ok(tem("são 3 mil reais"));
+  assert.ok(!tem("meu CPF é 123.456.789-00"));
+  assert.ok(!tem("CNPJ 12.345.678/0001-90"));
+  assert.ok(!tem("R$ 980,00"));
+});
