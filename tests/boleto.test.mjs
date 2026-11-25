@@ -7,6 +7,7 @@ import {
   ALERTA_NUMEROS,
   AVISO_BENEFICIARIO,
   AVISO_COMPARAR,
+  AVISO_COMPARAR_VALOR,
   AVISO_LINHA_VALIDA,
   conferirLinha,
   explicar,
@@ -131,7 +132,9 @@ test("o resultado sempre manda conferir o beneficiário e diz que número certo 
     const e = explicar(ler(linha));
     assert.equal(e.oQueFazer[0], AVISO_BENEFICIARIO, linha);
     assert.ok(e.oQueFazer.includes(AVISO_LINHA_VALIDA), linha);
-    assert.ok(e.oQueFazer.includes(AVISO_COMPARAR), linha);
+    const comparar = linha.startsWith("8") ? AVISO_COMPARAR_VALOR : AVISO_COMPARAR;
+    assert.ok(e.oQueFazer.includes(comparar), linha);
+    if (linha.startsWith("8")) assert.doesNotMatch(e.oQueFazer.join(" "), /vencimento/, "arrecadação não traz vencimento");
   }
   const vencimento = explicar(ler("00190.00009 01234.567897 01234.567178 9 16610000015000")).informacoes.join(" ");
   assert.match(vencimento, /estimativa/);

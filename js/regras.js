@@ -29,11 +29,6 @@ const FAZER_FALSO_PARENTE = [
   "Combine com a família uma palavra-chave para pedidos de dinheiro.",
 ];
 
-// passos condicionais, para o nível "atenção" (não acusam ninguém)
-const SE_NUMERO_NOVO =
-  "Se a mensagem veio de um número novo ou diferente, ligue para a pessoa no número que você já tinha antes de responder ou pagar.";
-const SE_NUMERO_DE_SEMPRE = "Se veio do número de sempre e você tem dúvida, uma ligação rápida resolve.";
-
 // ---- falsa central do banco (glossário nº 8 e nº 36; Febraban 01/07/2026)
 
 const FALSA_CENTRAL = "Falsa central do banco";
@@ -105,6 +100,9 @@ export const SINAIS = {
       "\\bnumero (temporario|provisorio|reserva|emprestado)\\b",
       "\\b(to|estou|tou) (usando|com|falando (do|pelo)) (o )?(celular|telefone|numero|whats|zap) d(o|a|e) (um|uma|meu|minha|outr)",
       "\\b(este|esse) (e|eh) (o )?meu (novo )?(numero|contato|zap|whats)\\b",
+      "\\b(usando|falando por|falando deste|falando desse) (este|esse) (zap|whats|numero|celular|telefone)\\b",
+      "\\b(celular|telefone|numero) emprestado\\b",
+      "\\bpeguei (o )?(celular|telefone)( emprestado)? d(a|o|e)\\b",
     ],
     exceto: [
       // "troquei de celular, mas o número é o mesmo"
@@ -126,7 +124,7 @@ export const SINAIS = {
       "\\bmanda (um )?(dinheiro|valor|grana)\\b",
       `\\b(preciso|precisando|precisava|necessito)\\b(?:[^.!?]|\\.\\d){0,30}${VALOR}`,
       `\\b(ajuda|ajudar|socorre|empresta|emprestar|arruma|arrumar|consegue|manda|mandar|passa|libera)\\w*\\b(?:[^.!?]|\\.\\d){0,25}${VALOR}`,
-      "\\bme ajuda\\w* com (uns |um )?\\d{2,}",
+      "\\bme (ajuda|salva|socorre)\\w* com (uns |um )?\\d{2,}",
       "\\b(preciso|precisando|precisava) (de )?(um |uma )?(dinheiro|grana)\\b",
     ],
   },
@@ -155,6 +153,8 @@ export const SINAIS = {
       "\\bsem acesso (ao|no) (banco|app|aplicativo)\\b",
       "\\bnao consigo (fazer|mandar) (o |um )?(pix|transferencia)\\b",
       "\\bconta (bloqueada|travada)\\b",
+      "\\b(bloqueou|bloquearam|travou|travaram) (o |meu |minha )?(cartao|conta|pix)\\b",
+      "\\b(meu |minha )?(cartao|conta|pix) (ta |esta |foi )?(bloquead|travad)[oa]\\b",
     ],
   },
   // S5 — promessa de devolver
@@ -185,7 +185,8 @@ export const SINAIS = {
       "\\bligacao (esta |ta )?(ruim|caindo|cortando)\\b",
       "\\b(to|estou) sem (audio|microfone)\\b",
       "\\bmicrofone (quebrou|nao funciona|ta ruim|esta ruim)\\b",
-      "\\bsem credito( pra| para)? ligar\\b",
+      "\\bsem credito\\b",
+      "\\b(nao consigo|sem conseguir) (te )?(ligar|falar|atender)\\b",
       "\\b(so|somente) (consigo |posso )?(falar|responder|teclar) por (mensagem|aqui|texto|escrito|whats)\\b",
       "\\bnao (me )?(liga|ligue)\\b",
     ],
@@ -205,6 +206,8 @@ export const SINAIS = {
     padroes: [
       "\\b(passa|passe|manda|mande|envia|envie|fala|informa|informe|informar|diga|digite|confirme)( pra mim| para mim| aqui)? (o |esse |aquele |este |seu )?codigo\\b",
       "\\bcodigo (que chegou|que recebeu|que voce recebeu|recebido|enviado|de verificacao|de seis digitos|de 6 digitos|por sms)\\b",
+      "\\b(passa|passe|manda|mande|envia|envie|informa|informe|diga|digite|confirme|confirma)( pra mim| para mim| aqui)? (os |o )?(6|seis) (numeros|digitos)\\b",
+      "\\b(numero|numeros) que (chegou|chegaram|recebeu|voce recebeu)( por sms| no seu celular)?\\b",
     ],
     exceto: ["\\b(nao|nunca) (passe|compartilhe|informe|envie|forneca|repasse) (o |esse |seu |este )?codigo\\b"],
   },
@@ -283,13 +286,20 @@ export const SINAIS = {
       "\\bdevol(v\\w*|ucao)\\b(?:[^.!?]|\\.\\d){0,40}\\bboleto\\b",
       "\\b(manda|mandar|faz|fazer|envia|enviar)\\w* de volta\\b(?:[^.!?]|\\.\\d){0,40}\\b(chave|conta|pix)\\b",
       "\\b(chave|conta) (certa|correta)\\b",
+      "\\b(devol(v\\w*|ucao)|de volta)\\b(?:[^.!?]|\\.\\d){0,40}\\b(pix|chave|conta) d(o|a) (meu|minha|um|uma)\\b",
     ],
   },
 
   // ---- empréstimo, prêmio, emprego
   "emprestimo": {
     nome: "Fala de empréstimo ou crédito",
-    padroes: ["\\bemprestimo\\b", "\\bcredito (aprovado|liberado|pre-aprovado|pre aprovado)\\b", "\\bportabilidade\\b"],
+    padroes: [
+      "\\bemprestimo\\b",
+      "\\bconsignado\\b",
+      "\\bcredito (aprovado|liberado|pre-aprovado|pre aprovado)\\b",
+      "\\bpre[- ]?aprovado\\b",
+      "\\bportabilidade\\b",
+    ],
   },
   "taxa-antecipada": {
     nome: "Pede pagamento antes de liberar",
@@ -298,6 +308,7 @@ export const SINAIS = {
       "\\b(pagar|pague|deposite|depositar) (o )?iof\\b",
       "\\bantecip\\w* (a )?(primeira )?parcela\\b",
       "\\bseguro obrigatorio (para|pra) liberar\\b",
+      "\\b(pag(ar|ue|amento)|deposit\\w*|transfer\\w*) (d(o|a) |o |a )?(seguro|primeira parcela|parcela antecipada)\\b(?:[^.!?]|\\.\\d){0,40}\\b(liberar|cair|liberacao|receber|creditad)",
     ],
   },
   "pagar-taxa": {
@@ -335,6 +346,7 @@ export const SINAIS = {
       "\\bevit(e|ar) (o |a |seu |sua )?(bloqueio|corte|negativacao|protesto|suspensao|cancelamento)\\b",
       "\\bpendencia\\b",
       "\\bultim(a|o) (notificacao|aviso)\\b",
+      "\\b(multa|debito) (pendente|em aberto|vencid[oa])\\b",
       "\\bencomenda (esta |foi )?retida\\b",
       "\\balfandega\\b",
       "\\bcpf (sera|vai ser) (cancelado|bloqueado|suspenso)\\b",
@@ -352,6 +364,7 @@ export const SINAIS = {
       "\\b(sera|vai ser|serao) (bloquead|suspens|cancelad|cortad|desligad|negativad|protestad)\\w*",
       "\\b(acao judicial|processo judicial|oficial de justica|mandado de)\\b",
       "\\bsetor (de )?cobranca\\b",
+      "\\b(multa|debito|divida) (pendente|em aberto|vencida|a pagar)\\b",
       "\\bevit(e|ar) (o |a |seu |sua )?(bloqueio|corte|negativacao|protesto|suspensao)\\b",
     ],
   },
@@ -361,6 +374,7 @@ export const SINAIS = {
       "\\b(pag(ue|ar|amento)|quit(e|ar|acao)|acordo|regulariz\\w*|deposit\\w*)\\b(?:[^.!?]|\\.\\d){0,50}\\b(pix|boleto|chave|cnpj|qr ?code)\\b",
       "\\b(boleto|chave pix|pix|qr ?code)\\b(?:[^.!?]|\\.\\d){0,30}\\b(anexo|em anexo|segue|abaixo|a seguir)\\b",
       "\\bsegue (o |a )?(boleto|chave|pix|qr)",
+      "\\bchave (pix )?(e |eh )?(o )?cnpj\\b",
     ],
   },
   "prazo-curto": {
@@ -424,9 +438,9 @@ export const REGRAS = [
     golpe: FALSO_PARENTE,
     familia: FAMILIA_FP,
     nivel: "forte",
-    quando: [["conta-terceiro", "urgencia"]],
+    quando: [["conta-terceiro", "urgencia"], ["conta-terceiro", "sigilo"], ["conta-terceiro", "evita-ligacao"]],
     peso: 5,
-    alerta: "Pede pagamento com pressa na conta de outra pessoa. Golpistas usam contas de terceiros para receber.",
+    alerta: "Pede pagamento na conta de outra pessoa, com pressa, segredo ou sem poder falar. Golpistas usam contas de terceiros para receber.",
     oQueFazer: FAZER_FALSO_PARENTE,
   },
   {
@@ -451,16 +465,6 @@ export const REGRAS = [
       "Antes de salvar o número novo, ligue para a pessoa no número antigo, que você já tinha, e confirme.",
       "Se ela não atender, confirme com outro parente.",
     ],
-  },
-  {
-    id: "pagamento-conta-terceiro",
-    golpe: "Pagamento na conta de outra pessoa",
-    familia: FAMILIA_FP,
-    nivel: "atencao",
-    quando: [["pedido-dinheiro", "conta-terceiro"]],
-    peso: 3,
-    alerta: "A mensagem pede pagamento na conta de outra pessoa.",
-    oQueFazer: [SE_NUMERO_NOVO, SE_NUMERO_DE_SEMPRE],
   },
 
   // ---------------- código de verificação: forte sozinho
@@ -532,7 +536,7 @@ export const REGRAS = [
     nivel: "forte",
     quando: [["pressao-ligacao"]],
     peso: 5,
-    alerta: "Pede para não desligar, não abrir o aplicativo ou não procurar a agência. O banco não faz isso: é para impedir que você confirme.",
+    alerta: "Pede para não desligar, não abrir o aplicativo ou não procurar a agência. Segundo a Febraban, o banco não usa urgência nem pressão; isso serve para impedir que você confirme.",
     oQueFazer: FAZER_FALSA_CENTRAL,
   },
   {

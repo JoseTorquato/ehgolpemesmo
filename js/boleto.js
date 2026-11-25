@@ -180,6 +180,8 @@ export const AVISO_LINHA_VALIDA =
 // de um número ali. Por isso: comparar com o que está impresso.
 export const AVISO_COMPARAR =
   "Compare o valor e o vencimento mostrados aqui com os que estão impressos no boleto. Se forem diferentes, não pague: um número trocado nessa parte nem sempre é percebido pela conferência.";
+export const AVISO_COMPARAR_VALOR =
+  "Compare o valor mostrado aqui com o que está impresso na conta. Se for diferente, não pague.";
 export const ALERTA_NUMEROS =
   "Os números não conferem — o boleto pode ter sido adulterado ou digitado errado. Confira número por número; se continuar assim, não pague.";
 
@@ -219,7 +221,7 @@ export function explicar(r) {
     else if (r.valorEmReferencia) informacoes.push("Valor: a linha traz uma referência, não o valor em reais.");
   }
 
-  oQueFazer.push(AVISO_COMPARAR, AVISO_LINHA_VALIDA);
+  oQueFazer.push(r.tipo === "cobranca" ? AVISO_COMPARAR : AVISO_COMPARAR_VALOR, AVISO_LINHA_VALIDA);
   return { alertas, informacoes, oQueFazer };
 }
 

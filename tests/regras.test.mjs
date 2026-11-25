@@ -181,7 +181,7 @@ test("as 6 mensagens normais de família da pesquisa", () => {
     ["Vó, a mãe pediu pra te avisar que o almoço é às 13h, não precisa levar nada", "nenhum"],
     ["Tô sem bateria, vou desligar, te ligo depois", "nenhum"],
     ["Mãe, paga esse boleto da faculdade pra mim? Tá no meu nome, vence hoje", "nenhum"],
-    ["Pode transferir pro Zé da oficina, a chave é o celular dele, ele já arrumou o carro", "atencao"],
+    ["Pode transferir pro Zé da oficina, a chave é o celular dele, ele já arrumou o carro", "nenhum"],
   ];
   for (const [msg, esperado] of casos) assert.equal(nivel(msg), esperado, msg);
 });
@@ -194,10 +194,8 @@ test("atenção: título proporcional e passos condicionais, sem 'nunca responda
   assert.equal(numeroNovo.encontrados[0].golpe, "Número novo de parente ou amigo");
   assert.match(numeroNovo.oQueFazer[0], /Antes de salvar o número novo, ligue/);
 
-  const terceiro = rodar("Pode transferir pro Zé da oficina, a chave é o celular dele");
-  assert.match(terceiro.oQueFazer.join(" "), /^Se a mensagem veio de um número novo/);
 
-  for (const msg of ["Mãe, troquei de número, salva esse", "Pode transferir pro Zé da oficina, a chave é o celular dele", "Mandei um pix de 50 por engano pra você"]) {
+  for (const msg of ["Mãe, troquei de número, salva esse", "Mandei um pix de 50 por engano pra você", "Se não reconhece a compra, ligue para o número no verso do seu cartão."]) {
     const r = rodar(msg);
     assert.equal(r.nivel, "atencao", msg);
     for (const e of r.encontrados) assert.doesNotMatch(e.golpe, /golpe|falso|falsa/i, msg);
@@ -218,4 +216,81 @@ test("um sinal sozinho só dá alerta forte nos casos que o banco nunca faz", ()
       if (c.length === 1) assert.ok(isolados.includes(c[0]), `${r.id}: ${c[0]} dá alerta forte sozinho`);
     }
   }
+});
+
+// ---- ajustes finais da v0.1 (remedição do Revisor) ------------------------------
+
+test("conta de terceiro só avisa combinada com número novo, segredo, pressa ou evita ligação", () => {
+  esperar([
+    "Faz um pix de 80 pro seu Zé da feira, a chave é o telefone dele",
+    "Pode pagar na conta da minha colega, ela me repassa",
+    "A chave pix é da minha vizinha, ela vai levar o bolo",
+  ], "nenhum");
+  esperar([
+    "Mãe, troquei de número. Faz o pix na conta da minha amiga",
+    "Não conta pra ninguém, manda na conta de um amigo meu",
+    "Urgente, manda pra chave do meu primo, ele me passa",
+    "Tô sem crédito, não consigo ligar. Manda na conta da minha colega",
+  ], "forte");
+});
+
+test("outro número anunciado sem 'troquei'", () => {
+  esperar([
+    "Vó, agora estou usando este zap. O banco bloqueou meu cartão, me salva com 400?",
+    "Mãe, peguei o celular emprestado da minha amiga. Preciso de 300 reais pra hoje",
+  ], "forte");
+  esperar(["Peguei o celular emprestado da minha amiga só pra te avisar que cheguei"], "atencao");
+  esperar(["O celular da escola tá emprestado pro professor"], "nenhum");
+});
+
+test("impedimento e evita ligação ditos de outro jeito", () => {
+  esperar([
+    "Pai, o banco bloqueou meu cartão, faz um pix pra mim?",
+    "Filho aqui, tô sem crédito e sem conseguir ligar. Paga esse valor pra mim?",
+  ], "forte");
+  esperar([
+    "O banco bloqueou meu cartão, já liguei e resolveram",
+    "Tô sem crédito, depois te ligo",
+  ], "nenhum");
+});
+
+test("código pedido como '6 números' ou 'número que chegou'", () => {
+  esperar([
+    "Aqui é do banco. Confirme os 6 números que chegaram por SMS para cancelar a compra.",
+    "Me passa o número que chegou no seu celular, por favor",
+  ], "forte");
+  esperar(["Anota os 6 números do protocolo: 123456"], "nenhum");
+});
+
+test("devolver no Pix de outra pessoa", () => {
+  esperar([
+    "Fiz uma transferência sem querer pra você, manda de volta nesse pix do meu marido",
+    "Caiu na sua conta 200 reais por engano, devolve no pix da minha esposa por favor",
+  ], "forte");
+  esperar(["Já devolvi o pix que você mandou por engano, confere aí"], "atencao");
+});
+
+test("multa ou cobrança com chave CNPJ, sem link", () => {
+  esperar([
+    "Multa pendente: pague hoje pela chave CNPJ 12.345.678/0001-90 para evitar protesto.",
+    "Débito em aberto. Seu nome será negativado amanhã. Chave pix é o CNPJ da empresa.",
+  ], "forte");
+  esperar([
+    "Paguei a multa do carro ontem pelo app do banco",
+    "A loja aceita pix, a chave é o CNPJ que está na nota",
+  ], "nenhum");
+});
+
+test("empréstimo pré-aprovado com seguro ou parcela antecipada", () => {
+  esperar([
+    "Seu consignado pré-aprovado de R$ 8.000 está pronto. Faça o pagamento do seguro para cair na conta hoje.",
+    "Crédito pré-aprovado! Pague a primeira parcela para liberar o valor.",
+  ], "forte");
+  esperar(["Paguei a primeira parcela do consignado, já caiu o desconto na folha"], "nenhum");
+});
+
+test("falsa central: texto fiel à fonte (urgência e pressão)", () => {
+  const r = rodar("Não desligue e não abra o aplicativo do banco.");
+  assert.match(r.encontrados[0].alerta, /não usa urgência nem pressão/);
+  assert.doesNotMatch(r.encontrados[0].alerta, /O banco não faz isso/);
 });
