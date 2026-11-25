@@ -14,6 +14,9 @@ const PALAVRAS_EXTRA = [
   "rastreio", "entrega", "frete", "seguro", "secure", "login", "conta", "cliente", "clientes",
 ];
 
+// palavras que fingem "loja oficial" quando vêm grudadas num nome fora da lista
+const PALAVRAS_ISCA = ["oficial", "outlet", "blackfriday", "queima", "liquida", "saldao"];
+
 // letras de outros alfabetos que parecem latinas (as mais usadas para imitar)
 const PARECIDAS = {
   "а": "a", "е": "e", "о": "o", "р": "p", "с": "c", "у": "y", "х": "x", "і": "i", "ј": "j",
@@ -32,6 +35,11 @@ export const TEXTOS_LINK = {
   encurtador: "É um link encurtado: não dá para ver para onde ele leva.",
   terminacao: (tld) =>
     `O endereço termina em .${tld}, terminação pouco comum para loja brasileira. Há lojas de verdade assim: sozinho, isso não quer dizer golpe.`,
+  arroba: (host) =>
+    `O endereço tem um @. O site de verdade é o que vem depois dele: ${host}. O que vem antes do @ é só para enganar.`,
+  ip: "O endereço é só um número (IP), sem nome de site. Loja de verdade não manda link assim.",
+  isca: (palavra) =>
+    `O endereço tem a palavra "${palavra}" grudada no nome. Golpistas usam palavras assim para parecer loja oficial.`,
   daLista: (m, reg) => `O endereço termina em ${reg}, que está na nossa lista de endereços da loja ${m} (conferida em ${CONFERIDO_EM}).`,
 };
 
@@ -109,24 +117,51 @@ export function simplificar(texto) {
   return semAcento([...texto.toLowerCase()].map((c) => PARECIDAS[c] ?? c).join(""));
 }
 
-/** Acha o primeiro endereço de site no texto colado. */
-export function extrairEndereco(texto) {
-  const t = String(texto ?? "").trim();
-  const m = t.match(/(?:https?:\/\/)?(?:[\p{L}\p{N}-]+\.)+[\p{L}]{2,}(?::\d+)?(?:[/?#][^\s]*)?/iu);
-  if (!m) return null;
-  // e-mail não é link
-  if (t[m.index - 1] === "@") return null;
-  return m[0];
-}
+// terminações que, no fim da parte antes do "@", mostram que ela imita um site
+// (e não é o nome de um e-mail, como "joao.silva@...")
+const PARECE_SITE = /(^|\.)(com|br|net|org|gov|shop|store|online|site|app|io|co|info|biz|xyz|top)$/i;
 
-function lerHost(endereco) {
-  const comEsquema = /^https?:/i.test(endereco) ? endereco : `https://${endereco}`;
+/**
+ * Lê o endereço como o navegador lê (new URL): o site é o que vem depois de
+ * um "@" que esteja antes da primeira barra. Devolve {host, usuario} ou null.
+ */
+export function lerEndereco(trecho) {
+  const limpo = String(trecho ?? "").trim().replace(/^[("'«<\[]+/, "").replace(/[)"'»>\].,;:!?]+$/, "");
+  if (!limpo) return null;
+  const temEsquema = /^https?:[/]{2}/i.test(limpo);
+  if (!temEsquema) {
+    if (/^(mailto|tel|sms|javascript|data|file|ftp|whatsapp|intent):/i.test(limpo)) return null;
+    const antesDaBarra = limpo.split(/[/?#\\]/)[0];
+    // javascript:, mailto: e afins (mas "usuario:senha@site" é link)
+    if (!antesDaBarra.includes("@") && /^[a-z][a-z0-9+.-]*:(?!\d)/i.test(limpo)) return null;
+    // e-mail comum (nome@site) não é link; "loja.com.br@golpe.shop" é
+    const email = limpo.match(/^([^@/?#\\\s]+)@[^@/?#\\\s]+$/);
+    if (email && !PARECE_SITE.test(email[1]) && !/[:%]|^www\./i.test(email[1])) return null;
+  }
+  let u;
   try {
-    const u = new URL(comEsquema);
-    return u.hostname.toLowerCase().replace(/\.$/, "");
+    u = new URL(temEsquema ? limpo : `https://${limpo}`);
   } catch {
     return null;
   }
+  if (!/^https?:$/.test(u.protocol)) return null;
+  const host = u.hostname.toLowerCase().replace(/\.$/, "");
+  const ehIp = /^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.startsWith("[");
+  if (!ehIp && !/\.[\p{L}]{2,}$/u.test(host) && !/\.xn--[a-z0-9-]+$/.test(host)) return null;
+  return { host, usuario: Boolean(u.username || u.password), ehIp };
+}
+
+/** Todos os endereços de site no texto colado, na ordem. */
+export function extrairEnderecos(texto) {
+  return String(texto ?? "")
+    .split(/\s+/)
+    .filter((p) => /[.]/.test(p) && lerEndereco(p))
+    .map((p) => p.replace(/^[("'«<\[]+/, "").replace(/[)"'»>\].,;:!?]+$/, ""));
+}
+
+/** O primeiro endereço de site no texto colado (ou null). */
+export function extrairEndereco(texto) {
+  return extrairEnderecos(texto)[0] ?? null;
 }
 
 /** Domínio registrável ("loja.com.br" em "ofertas.loja.com.br"). */
@@ -166,6 +201,10 @@ function lojaImitada(rotulo) {
   const pedacos = rotulo.split("-").filter(Boolean);
   const semExtras = pedacos.filter((p) => !PALAVRAS_EXTRA.includes(p) && !/^\d+$/.test(p));
   const candidatos = [...new Set([rotulo.replace(/-/g, ""), semExtras.join(""), ...pedacos])];
+  // o rótulo é exatamente o nome de uma loja (inclusive outra grafia da mesma
+  // empresa, como "mercadolibre"): é a loja com outra terminação, não imitação
+  const exata = LOJAS.find((l) => l.nomes.includes(rotulo));
+  if (exata) return { loja: exata, tipo: "exato" };
   let melhor = null;
   for (const loja of LOJAS) {
     for (const nome of loja.nomes) {
@@ -204,12 +243,21 @@ function marcaNoComeco(host, registravel) {
 export function conferirEndereco(texto) {
   if (!String(texto ?? "").trim()) return { status: "vazio" };
   const endereco = extrairEndereco(texto);
-  const host = endereco && lerHost(endereco);
-  if (!host || !host.includes(".")) return { status: "sem-endereco" };
+  const lido = endereco && lerEndereco(endereco);
+  if (!lido) return { status: "sem-endereco" };
+  const { host } = lido;
 
   const alertas = [];
   const informacoes = [];
   const add = (id, nivel, txt) => alertas.push({ id, nivel, texto: txt });
+
+  // "@" antes do site: o que vem antes dele é enfeite, o navegador abre o que vem depois
+  if (lido.usuario) add("arroba", "forte", TEXTOS_LINK.arroba(host));
+  if (lido.ehIp) {
+    add("ip", lido.usuario ? "forte" : "atencao", TEXTOS_LINK.ip);
+    const nivel = alertas.some((a) => a.nivel === "forte") ? "forte" : "atencao";
+    return { status: "lido", host, registravel: host, nivel, alertas, informacoes };
+  }
 
   const registravel = dominioRegistravel(host);
   const tld = host.split(".").pop();
@@ -223,7 +271,7 @@ export function conferirEndereco(texto) {
 
   const oficial = TODOS_OFICIAIS.get(registravel);
   if (oficial) {
-    informacoes.push(TEXTOS_LINK.daLista(oficial.marca, registravel));
+    if (!lido.usuario) informacoes.push(TEXTOS_LINK.daLista(oficial.marca, registravel));
   } else if (ENCURTADORES.includes(registravel) || ENCURTADORES.includes(host)) {
     add("encurtador", "atencao", TEXTOS_LINK.encurtador);
   } else {
@@ -238,6 +286,9 @@ export function conferirEndereco(texto) {
     if (noComeco && !imitada) add("marca-subdominio", "forte", TEXTOS_LINK.subdominio(noComeco.marca, registravel));
     if (temEspecial) add("punycode", alertas.some((a) => a.nivel === "forte") ? "forte" : "atencao", TEXTOS_LINK.punycode);
     if (TERMINACOES_INCOMUNS.includes(tld)) add("terminacao", "atencao", TEXTOS_LINK.terminacao(tld));
+    // marca que não está na lista + "oficial", "outlet"…: isca comum
+    const isca = !imitada && !noComeco && PALAVRAS_ISCA.find((p) => decodificado.replace(/-/g, "").includes(p));
+    if (isca) add("isca", TERMINACOES_INCOMUNS.includes(tld) ? "forte" : "atencao", TEXTOS_LINK.isca(isca));
   }
 
   const nivel = alertas.some((a) => a.nivel === "forte") ? "forte" : alertas.length ? "atencao" : "nenhum";
@@ -251,11 +302,16 @@ export function conferirEndereco(texto) {
  */
 export function analisarComLink(texto, base, analisar) {
   const r = analisar(texto, base);
-  const endereco = extrairEndereco(texto);
-  if (!endereco) return r;
-  const l = conferirEndereco(endereco);
-  if (l.status !== "lido" || !l.alertas.length) return r;
-  const doLink = l.alertas.map((a) => ({ id: `link-${a.id}`, golpe: "Link suspeito", nivel: a.nivel, alerta: a.texto, peso: a.nivel === "forte" ? 5 : 2 }));
+  const doLink = [];
+  for (const endereco of extrairEnderecos(texto)) {
+    const l = conferirEndereco(endereco);
+    if (l.status !== "lido") continue;
+    for (const a of l.alertas) {
+      if (doLink.some((d) => d.alerta === a.texto)) continue;
+      doLink.push({ id: `link-${a.id}`, golpe: "Link suspeito", nivel: a.nivel, alerta: a.texto, peso: a.nivel === "forte" ? 5 : 2 });
+    }
+  }
+  if (!doLink.length) return r;
   const encontrados = [...r.encontrados, ...doLink].sort((a, b) => (a.nivel === b.nivel ? b.peso - a.peso : a.nivel === "forte" ? -1 : 1));
   const oQueFazer = [...r.oQueFazer];
   for (const p of FAZER_LINK) if (!oQueFazer.includes(p)) oQueFazer.push(p);

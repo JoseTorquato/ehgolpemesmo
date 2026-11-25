@@ -1,11 +1,11 @@
 // Liga a página ao motor. O que a pessoa cola fica só na memória desta aba:
 // não é salvo, não é enviado, não vai para o compartilhamento.
 
-import { analisar, validar } from "./motor.js";
+import { validar } from "./motor.js";
 import { REGRAS, SINAIS } from "./regras.js";
 import { conferirLinha, explicar } from "./boleto.js";
-import { analisarComLink, conferirEndereco, FAZER_LINK, SEM_SINAL_LINK } from "./link.js";
-import { conferirAnuncio } from "./anuncio.js";
+import { conferirEndereco, FAZER_LINK, SEM_SINAL_LINK } from "./link.js";
+import { analisarMensagem, conferirAnuncio } from "./anuncio.js";
 import * as T from "./textos.js";
 
 const base = validar(SINAIS, REGRAS);
@@ -47,7 +47,8 @@ function conferirMensagem(evento) {
   evento.preventDefault();
   const texto = $("mensagem").value;
   if (!texto.trim()) return mostrar("vazio", paragrafo(T.VAZIO));
-  const r = analisarComLink(texto, base, analisar);
+  // regras da mensagem + links + regras de anúncio
+  const r = analisarMensagem(texto, base);
   if (r.nivel === "nenhum") {
     return mostrar("nenhum", paragrafo(T.SEM_SINAL, "resumo"), titulo(T.TITULO_FAZER), lista(T.PASSOS_GERAIS));
   }
@@ -124,7 +125,7 @@ function conferirLinkAnuncio(evento) {
   evento.preventDefault();
   const temLink = $("link").value.trim() !== "";
   const temAnuncio = $("anuncio").value.trim() !== "";
-  if (!temLink && !temAnuncio) return mostrar("vazio", paragrafo(T.VAZIO));
+  if (!temLink && !temAnuncio) return mostrar("vazio", paragrafo(T.VAZIO_LINK));
 
   const fortes = [];
   const atencoes = [];
@@ -132,6 +133,8 @@ function conferirLinkAnuncio(evento) {
   const passos = [...FAZER_LINK];
   if (temLink) {
     const r = conferirEndereco($("link").value);
+    // o que não é endereço de site: aviso de campo, sem cara de resultado
+    if (r.status === "sem-endereco" && !temAnuncio) return mostrar("vazio", paragrafo(T.SEM_ENDERECO));
     if (r.status === "sem-endereco") informacoes.push(T.SEM_ENDERECO);
     else {
       for (const a of r.alertas) (a.nivel === "forte" ? fortes : atencoes).push(a.texto);

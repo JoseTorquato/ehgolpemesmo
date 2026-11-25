@@ -5,6 +5,10 @@
 //   - .br: titular no RDAP do Registro.br (rdap.registro.br, consulta por domínio)
 //     é a empresa da loja (nome do titular anotado abaixo);
 //   - .com: o domínio .br da loja, já conferido, redireciona para ele.
+//   - de outro país: titular no RDAP/whois do registro do país (anotado).
+// Mesma empresa em outro país ou com outra grafia ("mercadolibre"): o nome
+// entra em `nomes`; domínio dela que não deu para conferir (titular oculto,
+// como mercadolibre.com) dá só atenção, nunca alerta forte.
 // Ficaram de fora as lojas cujo domínio não deu para conferir assim.
 // "renner" sozinho não entra: renner.com.br é de outra empresa (Renner Herrmann).
 // nomeComum: palavra comum ("extra", como em extra.globo.com); só conta quando
@@ -17,7 +21,7 @@ export const CONFERIDO_EM = "25/11/2026";
 
 export const LOJAS = [
   { marca: "Magazine Luiza", nomes: ["magazineluiza", "magalu"], dominios: ["magazineluiza.com.br", "magalu.com.br", "magazinevoce.com.br"], titular: "MAGAZINE LUIZA S/A" },
-  { marca: "Mercado Livre", nomes: ["mercadolivre"], dominios: ["mercadolivre.com.br"], titular: "Mercado Livre Brasil Ltda." },
+  { marca: "Mercado Livre", nomes: ["mercadolivre", "mercadolibre"], dominios: ["mercadolivre.com.br", "mercadolibre.com.ar", "mercadolibre.com.mx"], titular: "Mercado Livre Brasil Ltda.; mercadolibre.com.ar: MERCADOLIBRE S.R.L. (RDAP do NIC Argentina); mercadolibre.com.mx: MercadoLibre Inc. (whois do NIC México)" },
   { marca: "Amazon", nomes: ["amazon"], dominios: ["amazon.com.br"], titular: "Amazon Servicos de Varejo do Brasil Ltda." },
   { marca: "Americanas", nomes: ["americanas"], dominios: ["americanas.com.br"], titular: "Americanas SA" },
   { marca: "Submarino", nomes: ["submarino"], dominios: ["submarino.com.br"], titular: "Americanas SA" },

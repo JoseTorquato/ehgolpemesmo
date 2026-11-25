@@ -43,6 +43,9 @@ body {
   color: var(--texto);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   line-height: 1.5;
+  /* palavra longa quebra com hífen (o html é lang="pt-BR") */
+  hyphens: auto;
+  -webkit-hyphens: auto;
   /* fundo marcante, só CSS: nada é baixado de fora */
   background-color: var(--hero-1);
   background-image:
@@ -270,7 +273,8 @@ button.secundario,
 
 .resultado {
   margin-top: 1.5rem;
-  padding: 1rem;
+  /* folga lateral com teto pela largura da tela (texto a 200% em 320px) */
+  padding: 1rem min(1rem, 3vw);
   border-radius: 0.5rem;
   border: 2px solid var(--alerta-texto);
   background: var(--alerta-fundo);
@@ -282,7 +286,7 @@ button.secundario,
 }
 
 .resultado ul {
-  padding-left: 1.25rem;
+  padding-left: min(1.25rem, 5vw);
 }
 
 .resultado li + li {
@@ -348,7 +352,7 @@ a {
   font-size: 1.2rem;
   font-weight: 700;
   margin-top: 0;
-  padding: 0.75rem;
+  padding: 0.75rem min(0.75rem, 3vw);
   border: 3px solid var(--alerta-texto);
   border-radius: 0.5rem;
   background: var(--fundo);
