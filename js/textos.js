@@ -14,7 +14,6 @@ export const TITULO_CONFERIR = "Antes de pagar, confira";
 export const TITULO_TAMBEM = "Também confira";
 export const PASSO_DUVIDA = "Na dúvida, peça ajuda a alguém de confiança antes de fazer qualquer pagamento.";
 export const RESUMO_BOLETO_ALERTA = "Cuidado: esta linha de boleto tem problemas.";
-export const RESUMO_FORTE_BOLETO = "Cuidado: pagar boleto a pedido de outra pessoa é o jeito do golpe do falso parente.";
 
 
 export const SEM_SINAL =

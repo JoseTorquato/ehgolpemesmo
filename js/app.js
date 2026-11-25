@@ -80,6 +80,12 @@ function conferirMensagem(evento) {
 // fica só nesta variável, não é enviada nem guardada.
 let pediramParaPagar = null;
 
+function zerarPergunta() {
+  pediramParaPagar = null;
+  $("pediu-sim").setAttribute("aria-pressed", "false");
+  $("pediu-nao").setAttribute("aria-pressed", "false");
+}
+
 function responderPergunta(sim) {
   pediramParaPagar = sim;
   $("pediu-sim").setAttribute("aria-pressed", String(sim));
@@ -96,20 +102,19 @@ function conferirBoleto(evento) {
   });
   const nos = [];
   if (destaque) nos.push(paragrafo(destaque, "destaque"));
-  if (golpe) {
-    nos.push(
-      paragrafo(T.RESUMO_FORTE_BOLETO, "resumo"),
-      titulo(T.TITULO_SINAIS),
-      lista([`${golpe.golpe}: ${golpe.alerta}`, ...alertas]),
-    );
-  } else if (alertas.length) {
+  if (alertas.length) {
     nos.push(paragrafo(T.RESUMO_BOLETO_ALERTA, "resumo"), titulo(T.TITULO_SINAIS), lista(alertas));
+    // "Sim" junto com problema na linha: o texto neutro vem logo depois
+    if (golpe) nos.push(paragrafo(golpe.alerta));
+  } else if (golpe) {
+    // "Sim" sozinho não diz por onde veio o pedido: nível atenção, sem nome de golpe
+    nos.push(paragrafo(golpe.alerta, "resumo"));
   } else {
     nos.push(paragrafo(T.SEM_SINAL, "resumo"));
   }
   if (informacoes.length) nos.push(titulo(T.TITULO_BOLETO), lista(informacoes));
   nos.push(titulo(T.TITULO_FAZER), lista(oQueFazer));
-  mostrar(golpe || alertas.length ? "forte" : "nenhum", ...nos);
+  mostrar(alertas.length ? "forte" : golpe ? "atencao" : "nenhum", ...nos);
 }
 
 async function colarEm(id) {
@@ -137,7 +142,11 @@ $("aba-boleto").addEventListener("click", () => escolher("boleto"));
 $("form-mensagem").addEventListener("submit", conferirMensagem);
 $("form-boleto").addEventListener("submit", conferirBoleto);
 $("colar-mensagem").addEventListener("click", () => colarEm("mensagem"));
-$("colar-boleto").addEventListener("click", () => colarEm("boleto"));
+$("colar-boleto").addEventListener("click", () => {
+  zerarPergunta();
+  colarEm("boleto");
+});
+$("boleto").addEventListener("input", zerarPergunta);
 $("pediu-sim").addEventListener("click", () => responderPergunta(true));
 $("pediu-nao").addEventListener("click", () => responderPergunta(false));
 $("compartilhar").href = linkDoWhatsApp();

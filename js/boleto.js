@@ -180,7 +180,7 @@ export const DESTAQUE_NOME =
 export const ALERTA_PAGAR_POR_MIM = {
   golpe: "Falso parente ou amigo pedindo dinheiro",
   alerta:
-    "Alguém pediu para você pagar este boleto por ele. É assim o golpe do falso parente: os números do boleto podem estar certos, mas o dinheiro vai para quem aplica o golpe.",
+    "Pagar boleto a pedido de outra pessoa é um roteiro comum do golpe do falso parente. Se o pedido chegou por mensagem, ligue para a pessoa no número que você já conhecia antes de pagar.",
   oQueFazer: [
     "Antes de pagar, ligue para a pessoa no número que você já conhecia, ou fale com ela pessoalmente.",
     "Confira no aplicativo do banco o nome de quem vai receber. Se não for quem você esperava, não pague.",

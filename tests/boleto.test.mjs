@@ -182,7 +182,8 @@ test("'Alguém te pediu para pagar este boleto por ele?' — Sim mostra o alerta
   assert.equal(explicar(ler(linha), { pediramParaPagar: false }).golpe, null);
   const sim = explicar(ler(linha), { pediramParaPagar: true });
   assert.equal(sim.golpe, ALERTA_PAGAR_POR_MIM);
-  assert.equal(sim.golpe.golpe, "Falso parente ou amigo pedindo dinheiro");
+  assert.equal(sim.golpe.alerta, "Pagar boleto a pedido de outra pessoa é um roteiro comum do golpe do falso parente. Se o pedido chegou por mensagem, ligue para a pessoa no número que você já conhecia antes de pagar.");
+  assert.doesNotMatch(sim.golpe.alerta, /é o jeito do golpe/);
   assert.match(sim.oQueFazer[0], /número que você já conhecia, ou fale com ela pessoalmente/);
   assert.ok(sim.oQueFazer.some((p) => /nome de quem vai receber/.test(p)));
 });
