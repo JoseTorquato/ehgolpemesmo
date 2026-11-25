@@ -204,6 +204,33 @@ a {
   }
 }
 
+.destaque {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 0;
+  padding: 0.75rem;
+  border: 3px solid var(--alerta-texto);
+  border-radius: 0.5rem;
+  background: var(--fundo);
+  color: var(--texto);
+}
+
+.pergunta {
+  border: 0;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+
+.pergunta legend {
+  font-weight: 700;
+  padding: 0;
+}
+
+.pergunta button[aria-pressed="true"] {
+  background: var(--primario);
+  color: var(--primario-texto);
+}
+
 .resumo {
   font-weight: 700;
   font-size: 1.1rem;

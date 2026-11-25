@@ -29,6 +29,12 @@ const FAZER_FALSO_PARENTE = [
   "Combine com a família uma palavra-chave para pedidos de dinheiro.",
 ];
 
+const FAZER_PAGAR_POR_MIM = [
+  "Antes de pagar, ligue para a pessoa no número que você já conhecia, ou fale com ela pessoalmente.",
+  "Não pague boleto de outra pessoa sem confirmar com ela.",
+  "Se for pagar um boleto, confira no aplicativo do seu banco o nome de quem vai receber (o beneficiário).",
+];
+
 // ---- falsa central do banco (glossário nº 8 e nº 36; Febraban 01/07/2026)
 
 const FALSA_CENTRAL = "Falsa central do banco";
@@ -163,6 +169,68 @@ export const SINAIS = {
     padroes: [
       "\\b(te )?(devolvo|pago|acerto) (logo )?(amanha|depois|sexta|segunda|na semana)\\b",
       "\\bdepois te acerto\\b",
+      "\\b(transfiro|devolvo|te passo|te mando|ja mando|mando o pix|te pago|te reembolso)\\b(?:[^.!?]|\\.\\d){0,40}\\b(amanha|depois|sexta|segunda|na sua conta|logo)\\b",
+      "\\b(amanha|depois)\\b(?:[^.!?]|\\.\\d){0,60}\\b(transfiro|devolvo|te passo|te mando|ja mando|mando o pix|te pago)\\b",
+    ],
+  },
+  // ---- "pagar por mim": pede para OUTRA pessoa pagar por ela, com
+  // impedimento de app/senha/conta (Polícia Civil de Goiás: "meu cartão
+  // estourou o limite… me deposita"; glossário nº 23)
+  "pagar-por-mim": {
+    nome: "Pede para você pagar por ela",
+    padroes: [
+      "\\b(paga|pagar|pague|faz|fazer|faca)\\w*( esse| este| essa| o| a| um| uma)? (pagamento|boleto|conta|pix)\\b(?:[^.!?]|\\.\\d){0,25}\\b(pra mim|para mim|por mim)\\b",
+      "\\b(paga|pagar|pague|faz|faca) (pra mim|para mim|por mim)\\b",
+      "\\bconsegue (me )?(pagar|fazer (esse|este|o|um) (pagamento|pix|boleto))\\b",
+      "\\bse eu (te )?(mandar|enviar|passar) o (boleto|codigo de barras|pix|link)\\b",
+      "\\bpagar na sua conta\\b",
+      "\\bfaz (esse|este) pagamento\\b",
+      "\\bpode pagar (esse|este|o|um) (boleto|pix|pagamento)\\b",
+      "\\bvoce (paga|pagaria|(poderia|pode|consegue) pagar)\\b",
+      "\\bpaga-?l[oa] (pra|para|por) mim\\b",
+      "\\b(paga|pagar|pague|pagaria)\\w*\\b(?:[^.!?]|\\.\\d){0,30}\\bno meu lugar\\b",
+      "\\b(efetuar|efetue|realizar|realize)\\w* (o |esse |este |um |uma )?(pagamento|pix|transferencia)\\b(?:[^.!?]|\\.\\d){0,25}\\b(pra mim|para mim|por mim)\\b",
+    ],
+  },
+  // impedimento dito de forma mais fraca (ir à agência, senha de transação):
+  // só conta junto com "pagar por mim"; sozinho com Pix não acusa ninguém
+  // quem fala se OFERECE para pagar ("quer que eu pague a sua conta?"):
+  // anula as regras de "pagar por mim"
+  "oferta-pagar": {
+    nome: "Oferece pagar por você",
+    padroes: [
+      "\\b(quer|queres|prefere|posso|deixa) que eu (pague|pago|faca|faco|transfira|mande)\\b",
+      "\\beu (pago|faco o pix|transfiro|pago pra voce|pago para voce)\\b(?:[^.!?]|\\.\\d){0,20}\\b(sua|seu|pra voce|para voce)\\b",
+      "\\b(posso|eu posso) (pagar|fazer o pix|transferir) (a sua|o seu|pra voce|para voce)\\b",
+    ],
+  },
+  "impedimento-pagar": {
+    nome: "Diz que o app, a senha ou a conta não funciona",
+    padroes: [
+      "\\btravou\\b(?:[^.!?]|\\.\\d){0,30}\\b(app|aplicativo|senha|conta|cartao)\\b",
+      "\\bsenha (de transacao|eletronica|do app|do aplicativo|do banco)\\b",
+      "\\b(passo|passar|passando|vou|ir|indo) (la )?(na|a|ate a) agencia\\b",
+      "\\b(mudar|trocar|desbloquear|resetar|refazer) (a |minha )?senha\\b",
+      "\\b(banco|app|aplicativo) (bloqueou|travou)\\b",
+      "\\b(conta|internet banking|app|aplicativo|cartao)\\b(?:[^.!?]){0,20}\\b(bloqueou|bloquead[oa]|bloquearam|travad[oa]|travou|suspens[oa])\\b",
+      "\\bsem acesso (a|ao|na|no) (meu |minha )?(banco|app|aplicativo|conta|internet banking)\\b",
+      "\\b(erro no|erro com o|problema no) (token|app|aplicativo|internet banking)\\b",
+      "\\b(token|app|aplicativo) (deu|da|dando|com) erro\\b",
+    ],
+  },
+  "prazo-hoje": {
+    nome: "Diz que tem que ser hoje",
+    padroes: ["\\bhoje\\b", "\\bultimo dia\\b", "\\b(desconto|vence|vencimento) (ate |e )?hoje\\b"],
+  },
+  // valor a partir de R$ 1.000: acima dos pedidos pequenos do dia a dia
+  // (gás, mercado, remédio) e na faixa dos casos da Polícia Civil de Goiás
+  "valor-alto": {
+    nome: "Valor alto (R$ 1.000 ou mais)",
+    padroes: [
+      "\\b(r\\$ ?)?\\d{1,3}(\\.\\d{3})+(,\\d{2})?\\b(?![-/.]?\\d)",
+      "\\br\\$ ?\\d{4,}\\b",
+      "\\b\\d{4,},\\d{2}\\b",
+      "\\b\\d+([.,]\\d+)? ?mil\\b",
     ],
   },
   // S6 — conta de outra pessoa
@@ -478,6 +546,47 @@ export const REGRAS = [
       "Antes de salvar o número novo, ligue para a pessoa no número antigo, que você já tinha, e confirme.",
       "Se ela não atender, confirme com outro parente.",
     ],
+  },
+
+  {
+    id: "pagar-por-mim",
+    golpe: FALSO_PARENTE,
+    familia: FAMILIA_FP,
+    nivel: "forte",
+    quando: [
+      ["pagar-por-mim", "impedimento", "promessa-devolucao"],
+      ["pagar-por-mim", "impedimento", "urgencia"],
+      ["pagar-por-mim", "impedimento", "prazo-hoje"],
+      ["pagar-por-mim", "impedimento", "valor-alto"],
+      ["pagar-por-mim", "impedimento-pagar", "promessa-devolucao"],
+      ["pagar-por-mim", "impedimento-pagar", "urgencia"],
+      ["pagar-por-mim", "impedimento-pagar", "prazo-hoje"],
+      ["pagar-por-mim", "impedimento-pagar", "valor-alto"],
+    ],
+    exceto: ["oferta-pagar"],
+    peso: 5,
+    alerta: "Pede para você pagar um boleto ou um Pix por ela, dizendo que o aplicativo, a senha ou a conta não funciona, e promete devolver ou tem pressa. É um jeito comum do golpe do falso parente.",
+    oQueFazer: FAZER_PAGAR_POR_MIM,
+  },
+  {
+    id: "pagar-por-mim-confirmar",
+    golpe: "Pedido para pagar por outra pessoa",
+    familia: FAMILIA_FP,
+    nivel: "atencao",
+    quando: [
+      ["impedimento", "pagar-por-mim"],
+      ["impedimento", "promessa-devolucao"],
+      ["impedimento", "urgencia"],
+      ["impedimento", "prazo-hoje"],
+      ["impedimento-pagar", "pagar-por-mim"],
+      ["impedimento-pagar", "promessa-devolucao"],
+      ["impedimento-pagar", "urgencia"],
+      ["impedimento-pagar", "prazo-hoje"],
+    ],
+    exceto: ["oferta-pagar"],
+    peso: 3,
+    alerta: "A mensagem pede pagamento ou diz que o aplicativo, a senha ou a conta da pessoa não está funcionando.",
+    oQueFazer: FAZER_PAGAR_POR_MIM,
   },
 
   // ---------------- código de verificação: forte sozinho

@@ -314,3 +314,91 @@ test("bloqueio com cara de banco aparece como falsa central, não como falso par
 test("contexto de banco sozinho não gera aviso (só escolhe o nome do golpe)", () => {
   assert.equal(nivel("Seu cartão novo chegou na agência, o gerente pediu para buscar."), "nenhum");
 });
+
+// ---- "pagar por mim": pede para OUTRA pessoa pagar, com app/senha/conta travada
+
+const PAGAR_POR_MIM = [
+  "Deu um imprevisto aqui. Tenho que pagar um boleto hoje mas travou no aplicativo minha senha de transação.",
+  "Hoje é o último dia que pago com desconto. Amanhã passando na agência já mando o pix.",
+  "Se eu mandar o boleto consegue pagar na sua conta? 2.100,00 o valor do boleto. Amanhã cedo passo na agência pra mudar a senha e transfiro na sua conta.",
+];
+
+test("pagar por mim: a conversa inteira dá forte, cada mensagem pelo menos atenção", () => {
+  const juntas = rodar(PAGAR_POR_MIM.join("\n"));
+  assert.equal(juntas.nivel, "forte");
+  assert.deepEqual(juntas.encontrados.map((e) => e.golpe), ["Falso parente ou amigo pedindo dinheiro"]);
+  const passos = juntas.oQueFazer.join(" ");
+  assert.match(passos, /número que você já conhecia, ou fale com ela pessoalmente/);
+  assert.match(passos, /Não pague boleto de outra pessoa sem confirmar/);
+  assert.match(passos, /beneficiário/);
+  for (const msg of PAGAR_POR_MIM) assert.notEqual(nivel(msg), "nenhum", msg);
+});
+
+test("pagar por mim: mesma classe, outras palavras", () => {
+  esperar([
+    "Oi, o app do banco travou e minha senha bloqueou. Consegue pagar esse boleto de 1.850,00 pra mim? Te devolvo amanhã",
+    "Tô sem acesso ao aplicativo, faz esse pagamento por mim hoje? Amanhã eu transfiro",
+    "Meu limite estourou, se eu te mandar o boleto você paga? É o último dia",
+  ], "forte");
+  esperar(["Travou minha senha de transação, amanhã passo na agência e te passo o pix"], "atencao");
+});
+
+test("pagar por mim: pedido de família SEM impedimento continua sem aviso", () => {
+  esperar([
+    "Paga a conta de luz que eu te devolvo",
+    "Faz um pix pra mim que te pago sexta",
+    "Pode pagar o boleto da escola pra mim? Te devolvo amanhã",
+    "Hoje é o último dia do desconto da loja, vamos?",
+    "Meu app do banco travou, depois eu vejo isso",
+    "Vou passar na agência amanhã pra resolver a senha",
+  ], "nenhum");
+});
+
+test("pagar por mim: oferta em primeira pessoa não é pedido", () => {
+  esperar([
+    "Vou passar na agência hoje pra trocar a senha, quer que eu pague a sua conta também?",
+    "Meu app travou, mas posso pagar a sua conta amanhã na agência",
+    "Deixa que eu pago o seu boleto hoje, minha senha já voltou",
+  ], "nenhum");
+  // o pedido de verdade, na mesma situação, continua avisando
+  assert.notEqual(nivel("Vou passar na agência hoje pra trocar a senha, consegue pagar a minha conta pra mim?"), "nenhum");
+});
+
+test("pagar por mim: pedido e impedimento ditos de outras formas", () => {
+  esperar([
+    "Poderia efetuar o pagamento por mim? O acesso ao internet banking foi bloqueado. Amanhã te devolvo",
+    "Você paga essa conta pra mim? Tô sem acesso ao meu banco, amanhã te mando de volta",
+    "Deu erro no token aqui. Consegue pagá-lo para mim hoje? É o último dia",
+    "Minha conta bloqueou, paga no meu lugar esse boleto de 1.300,00? Te devolvo amanhã",
+    "Tô com o app travado, você paga pra mim? Te pago sexta",
+  ], "forte");
+  // as versões normais parecidas
+  esperar([
+    "Você paga a conta de luz e eu pago a de água, combinado?",
+    "Minha conta bloqueou, mas já resolvi no banco",
+    "Deu erro no token, vou ligar no banco amanhã",
+    "Paga no meu lugar o pão hoje? Eu esqueci a carteira",
+  ], "nenhum");
+});
+
+test("pagar por mim: pedido e impedimento em mensagens diferentes, coladas juntas", () => {
+  const conversa = [
+    "Oi, tudo bem? Deu um problema aqui.",
+    "O aplicativo do banco travou e não consigo fazer nada.",
+    "Consegue pagar esse boleto pra mim?",
+    "Amanhã eu transfiro pra você.",
+  ];
+  for (const msg of conversa.slice(0, 1)) assert.equal(nivel(msg), "nenhum", msg);
+  assert.equal(nivel(conversa.join("\n")), "forte");
+});
+
+test("valor alto não casa CPF, CNPJ nem protocolo com pontos", async () => {
+  const { sinaisPresentes, normalizar } = await import("../js/motor.js");
+  const tem = (t) => sinaisPresentes(normalizar(t), SINAIS).has("valor-alto");
+  assert.ok(tem("o valor é 2.100,00"));
+  assert.ok(tem("R$ 1.850"));
+  assert.ok(tem("são 3 mil reais"));
+  assert.ok(!tem("meu CPF é 123.456.789-00"));
+  assert.ok(!tem("CNPJ 12.345.678/0001-90"));
+  assert.ok(!tem("R$ 980,00"));
+});

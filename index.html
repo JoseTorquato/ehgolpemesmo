@@ -37,6 +37,13 @@
     <form id="form-boleto" novalidate hidden>
       <label for="boleto">Cole aqui a linha digitável do boleto (os números)</label>
       <input id="boleto" type="text" inputmode="numeric" autocomplete="off" spellcheck="false">
+      <fieldset class="pergunta">
+        <legend>Alguém te pediu para pagar este boleto por ele?</legend>
+        <div class="acoes">
+          <button type="button" id="pediu-sim" class="secundario" aria-pressed="false">Sim</button>
+          <button type="button" id="pediu-nao" class="secundario" aria-pressed="false">Não</button>
+        </div>
+      </fieldset>
       <div class="acoes">
         <button type="button" id="colar-boleto" class="secundario">Colar</button>
         <button type="submit">Conferir</button>

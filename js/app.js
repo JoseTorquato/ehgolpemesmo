@@ -76,20 +76,45 @@ function conferirMensagem(evento) {
   mostrar(r.nivel, ...nos);
 }
 
+// Resposta à pergunta "Alguém te pediu para pagar este boleto por ele?":
+// fica só nesta variável, não é enviada nem guardada.
+let pediramParaPagar = null;
+
+function zerarPergunta() {
+  pediramParaPagar = null;
+  $("pediu-sim").setAttribute("aria-pressed", "false");
+  $("pediu-nao").setAttribute("aria-pressed", "false");
+}
+
+function responderPergunta(sim) {
+  pediramParaPagar = sim;
+  $("pediu-sim").setAttribute("aria-pressed", String(sim));
+  $("pediu-nao").setAttribute("aria-pressed", String(!sim));
+  if (!$("resultado").hidden && $("boleto").value.trim()) conferirBoleto();
+}
+
 function conferirBoleto(evento) {
-  evento.preventDefault();
+  evento?.preventDefault();
   const r = conferirLinha($("boleto").value);
   if (r.status === "vazio") return mostrar("vazio", paragrafo(T.VAZIO));
-  const { alertas, informacoes, oQueFazer } = explicar(r);
+  const { destaque, golpe, alertas, informacoes, oQueFazer } = explicar(r, {
+    pediramParaPagar: pediramParaPagar === true,
+  });
   const nos = [];
+  if (destaque) nos.push(paragrafo(destaque, "destaque"));
   if (alertas.length) {
     nos.push(paragrafo(T.RESUMO_BOLETO_ALERTA, "resumo"), titulo(T.TITULO_SINAIS), lista(alertas));
+    // "Sim" junto com problema na linha: o texto neutro vem logo depois
+    if (golpe) nos.push(paragrafo(golpe.alerta));
+  } else if (golpe) {
+    // "Sim" sozinho não diz por onde veio o pedido: nível atenção, sem nome de golpe
+    nos.push(paragrafo(golpe.alerta, "resumo"));
   } else {
     nos.push(paragrafo(T.SEM_SINAL, "resumo"));
   }
   if (informacoes.length) nos.push(titulo(T.TITULO_BOLETO), lista(informacoes));
   nos.push(titulo(T.TITULO_FAZER), lista(oQueFazer));
-  mostrar(alertas.length ? "forte" : "nenhum", ...nos);
+  mostrar(alertas.length ? "forte" : golpe ? "atencao" : "nenhum", ...nos);
 }
 
 async function colarEm(id) {
@@ -117,5 +142,15 @@ $("aba-boleto").addEventListener("click", () => escolher("boleto"));
 $("form-mensagem").addEventListener("submit", conferirMensagem);
 $("form-boleto").addEventListener("submit", conferirBoleto);
 $("colar-mensagem").addEventListener("click", () => colarEm("mensagem"));
-$("colar-boleto").addEventListener("click", () => colarEm("boleto"));
+$("colar-boleto").addEventListener("click", () => {
+  zerarPergunta();
+  colarEm("boleto");
+});
+// outro boleto: zera a resposta e esconde o resultado do boleto anterior
+$("boleto").addEventListener("input", () => {
+  zerarPergunta();
+  $("resultado").hidden = true;
+});
+$("pediu-sim").addEventListener("click", () => responderPergunta(true));
+$("pediu-nao").addEventListener("click", () => responderPergunta(false));
 $("compartilhar").href = linkDoWhatsApp();
