@@ -43,6 +43,9 @@ body {
   color: var(--texto);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   line-height: 1.5;
+  /* palavra longa quebra com hífen (o html é lang="pt-BR") */
+  hyphens: auto;
+  -webkit-hyphens: auto;
   /* fundo marcante, só CSS: nada é baixado de fora */
   background-color: var(--hero-1);
   background-image:
@@ -395,10 +398,12 @@ a {
 }
 
 .card {
+  /* bordas e folgas laterais com teto pela largura da tela: com o texto a
+     200% em 320px, em rem elas comiam o espaço e partiam as palavras */
   border: 2px solid var(--secundario-fundo);
-  border-left: 0.4rem solid var(--primario);
+  border-left: min(0.4rem, 1.5vw) solid var(--primario);
   border-radius: 0.75rem;
-  padding: 0.25rem min(1rem, 4vw) 0.75rem;
+  padding: 0.25rem min(1rem, 3vw) 0.75rem;
   margin-top: 1.5rem;
 }
 
@@ -409,7 +414,7 @@ a {
 
 .card ol,
 .card ul {
-  padding-left: 1.25rem;
+  padding-left: min(1.25rem, 5vw);
 }
 
 .card li + li {
@@ -418,7 +423,7 @@ a {
 
 .numero {
   font-weight: 700;
-  padding: 0.75rem;
+  padding: 0.75rem min(0.75rem, 3vw);
   border-radius: 0.5rem;
   background: var(--alerta-fundo);
   color: var(--alerta-texto);

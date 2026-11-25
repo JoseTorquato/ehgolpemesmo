@@ -49,7 +49,7 @@ test("as 4 dicas para a família, cada uma com fonte", () => {
 const NUMEROS_CONFERIDOS = new Set([
   "73 mil", "139 mil", "195,7%", "174 mil", "604", "147%", "625", "R$ 1.000",
   "20h", "6h", "24 a 48 horas", "6 números", "1º semestre de 2025", "2º golpe",
-  "23 a 29/11/2025", "11/11/2025", "0 no lugar de o",
+  "23 a 29/11/2025", "11/11/2025", "0 no lugar de o", "regra de 2021",
 ]);
 
 test("todo número do texto é conferido, e o card dele mostra a fonte com data", () => {
