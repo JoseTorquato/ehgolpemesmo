@@ -149,3 +149,13 @@ test("o texto colado nunca vira HTML (sem innerHTML)", () => {
     .map((a) => a.caminho);
   assert.deepEqual(achados, []);
 });
+
+test("o site só convida a colar um link quando tiver o campo de conferir link", () => {
+  const paginas = codigo().filter((a) => a.ext === ".html");
+  const temCampoDeLink = paginas.some((a) => /<input id="link"/.test(a.texto));
+  if (temCampoDeLink) return;
+  for (const { caminho, texto } of paginas) {
+    assert.doesNotMatch(texto, /ou o link|e o link antes/i, caminho);
+  }
+  assert.doesNotMatch(readFileSync(join(RAIZ, "ferramentas", "og.svg"), "utf8"), /o link/, "ferramentas/og.svg");
+});
