@@ -125,13 +125,22 @@ const PARECE_SITE = /(^|\.)(com|br|net|org|gov|shop|store|online|site|app|io|co|
  * Lê o endereço como o navegador lê (new URL): o site é o que vem depois de
  * um "@" que esteja antes da primeira barra. Devolve {host, usuario} ou null.
  */
-export function lerEndereco(trecho) {
+export function lerEndereco(trecho, { sozinho = false } = {}) {
   const limpo = String(trecho ?? "").trim().replace(/^[("'«<\[]+/, "").replace(/[)"'»>\].,;:!?]+$/, "");
   if (!limpo) return null;
   const temEsquema = /^https?:[/]{2}/i.test(limpo);
   if (!temEsquema) {
     if (/^(mailto|tel|sms|javascript|data|file|ftp|whatsapp|intent):/i.test(limpo)) return null;
     const antesDaBarra = limpo.split(/[/?#\\]/)[0];
+    // Só números e pontos ("1.250", "2.300", "11.11") é valor, não endereço.
+    // Sem http(s)://, só conta como IP com 4 grupos de verdade seguidos de
+    // "/" ou ":" (ou sozinho no campo).
+    const parteHost = antesDaBarra.split("@").pop().split(":")[0];
+    if (/^[\d.]+$/.test(parteHost)) {
+      const quatroGrupos = /^\d{1,3}(\.\d{1,3}){3}$/.test(parteHost);
+      const depois = limpo.slice(limpo.indexOf(parteHost) + parteHost.length);
+      if (!quatroGrupos || !(sozinho || /^[/:]/.test(depois))) return null;
+    }
     // javascript:, mailto: e afins (mas "usuario:senha@site" é link)
     if (!antesDaBarra.includes("@") && /^[a-z][a-z0-9+.-]*:(?!\d)/i.test(limpo)) return null;
     // e-mail comum (nome@site) não é link; "loja.com.br@golpe.shop" é
@@ -153,9 +162,10 @@ export function lerEndereco(trecho) {
 
 /** Todos os endereços de site no texto colado, na ordem. */
 export function extrairEnderecos(texto) {
-  return String(texto ?? "")
-    .split(/\s+/)
-    .filter((p) => /[.]/.test(p) && lerEndereco(p))
+  const pedacos = String(texto ?? "").trim().split(/\s+/);
+  const sozinho = pedacos.length === 1;
+  return pedacos
+    .filter((p) => /[.]/.test(p) && lerEndereco(p, { sozinho }))
     .map((p) => p.replace(/^[("'«<\[]+/, "").replace(/[)"'»>\].,;:!?]+$/, ""));
 }
 
@@ -243,7 +253,7 @@ function marcaNoComeco(host, registravel) {
 export function conferirEndereco(texto) {
   if (!String(texto ?? "").trim()) return { status: "vazio" };
   const endereco = extrairEndereco(texto);
-  const lido = endereco && lerEndereco(endereco);
+  const lido = endereco && lerEndereco(endereco, { sozinho: true }); // já validado por extrairEndereco
   if (!lido) return { status: "sem-endereco" };
   const { host } = lido;
 

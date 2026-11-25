@@ -41,8 +41,10 @@ const CENARIOS = [
 ];
 
 // Conta palavras do conteúdo que começam numa linha e terminam em outra.
+// "com hífen": a quebra cai num hífen que já está na palavra (e-mail);
+// "sem hífen": a palavra foi partida no meio das letras.
 const CONTAR_QUEBRADAS = `(() => {
-  let n = 0;
+  let n = 0, comHifen = 0, semHifen = 0;
   const exemplos = [];
   const andar = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   while (andar.nextNode()) {
@@ -53,10 +55,18 @@ const CONTAR_QUEBRADAS = `(() => {
       r.setStart(no, m.index);
       r.setEnd(no, m.index + m[0].length);
       const topos = new Set([...r.getClientRects()].map((q) => Math.round(q.top)));
-      if (topos.size > 1) { n++; if (exemplos.length < 5) exemplos.push(m[0]); }
+      if (topos.size < 2) continue;
+      n++;
+      // onde a linha muda: a letra antes dela é um hífen da própria palavra?
+      const topoDe = (i) => { const c = document.createRange(); c.setStart(no, m.index + i); c.setEnd(no, m.index + i + 1); return Math.round(c.getBoundingClientRect().top); };
+      const primeiro = topoDe(0);
+      let i = 1;
+      while (i < m[0].length && topoDe(i) === primeiro) i++;
+      if (m[0][i - 1] === "-") comHifen++;
+      else { semHifen++; if (exemplos.length < 5) exemplos.push(m[0]); }
     }
   }
-  return { n, exemplos };
+  return { n, comHifen, semHifen, exemplos };
 })()`;
 
 const CANDIDATOS = [
@@ -139,7 +149,8 @@ for (const { pagina, nome, js } of CENARIOS) {
       if (!ok) falhas++;
       console.log(
         `${ok ? "ok  " : "ROLA"} ${nome.padEnd(18)} ${largura}px texto ${escala * 100}%: scrollWidth ${m.s} / largura ${m.c}` +
-          ` · palavras partidas: ${q.n}${q.exemplos.length ? ` (${q.exemplos.join(", ")})` : ""}`,
+          ` · palavras partidas: ${q.n} (no hífen da palavra: ${q.comHifen}; no meio: ${q.semHifen}` +
+          `${q.exemplos.length ? ` — ${q.exemplos.join(", ")}` : ""})`,
       );
     }
   }

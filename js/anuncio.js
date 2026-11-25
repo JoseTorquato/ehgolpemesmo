@@ -268,7 +268,11 @@ export function analisarMensagem(texto, base) {
   if (a.nivel === "nenhum") return r;
   // conversa de família ("me manda o pix pra reservar a mesa") não é anúncio:
   // sinal fraco de anúncio só conta se o texto tem cara de oferta
-  const pareceOferta = /\br\$ ?\d|\d ?% ?(off|de desconto)|\b(promo\w*|oferta|desconto|black friday)\b/.test(normalizar(texto));
+  // venda de particular também conta ("vendo", "à venda", "seminovo"…)
+  const pareceOferta =
+    /\br\$ ?\d|\d ?% ?(off|de desconto)|\b(promo\w*|oferta|desconto|black friday|vendo|vende-se|vendemos|a venda|seminov[oa]|lacrad[oa]|frete|estoque|anuncio)\b/.test(
+      normalizar(texto),
+    );
   const doAnuncio = a.encontrados.filter((e) => e.nivel === "forte" || pareceOferta);
   if (!doAnuncio.length) return r;
   const encontrados = [...r.encontrados];
