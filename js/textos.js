@@ -5,11 +5,19 @@
 
 export const TITULO_SINAIS = "Sinais de alerta encontrados";
 export const TITULO_FAZER = "O que fazer agora";
+export const TITULO_BOLETO = "O que a linha do boleto mostra";
+
+export const RESUMO_FORTE = "Cuidado: esta mensagem tem sinais fortes de golpe.";
+export const RESUMO_ATENCAO = "Atenção: há pontos para conferir antes de fazer qualquer coisa.";
+export const RESUMO_BOLETO_ALERTA = "Cuidado: esta linha de boleto tem problemas.";
+
+export const PREFIXO_FORTE = "Alerta forte";
+export const PREFIXO_ATENCAO = "Atenção";
 
 export const SEM_SINAL =
   "Nenhum sinal de alerta encontrado — mesmo assim, confirme por outro canal.";
 
-// Passos gerais, que valem para qualquer mensagem ou boleto.
+// Passos gerais, que valem para qualquer mensagem.
 export const PASSOS_GERAIS = [
   "Não pague e não clique em link antes de confirmar.",
   "Ligue para a pessoa ou para a empresa num número que você já tinha, não no número da mensagem.",
@@ -17,9 +25,6 @@ export const PASSOS_GERAIS = [
 ];
 
 export const VAZIO = "Cole a mensagem ou a linha do boleto no campo acima e toque em Conferir.";
-
-export const BOLETO_INDISPONIVEL =
-  "A conferência da linha do boleto ainda está sendo preparada. Por enquanto, confira o nome de quem vai receber no aplicativo do seu banco, antes de pagar.";
 
 export const COLAR_SEM_PERMISSAO =
   "Não foi possível colar automaticamente. Toque e segure no campo e escolha Colar.";

@@ -152,10 +152,6 @@ button.secundario,
   margin-top: 0.5rem;
 }
 
-.sem-sinal {
-  font-weight: 700;
-}
-
 .em-preparo {
   font-style: italic;
   color: var(--texto-suave);
@@ -199,4 +195,15 @@ a {
     transition: none !important;
     animation: none !important;
   }
+}
+
+.resumo {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-top: 0;
+}
+
+.fonte {
+  font-size: 0.9rem;
+  color: var(--texto-suave);
 }

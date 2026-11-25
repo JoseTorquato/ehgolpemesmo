@@ -1,13 +1,13 @@
 // Liga a página ao motor. O que a pessoa cola fica só na memória desta aba:
 // não é salvo, não é enviado, não vai para o compartilhamento.
 
-import { analisar, validarRegras } from "./motor.js";
-import { REGRAS } from "./regras.js";
-import { conferirLinha } from "./boleto.js";
+import { analisar, validar } from "./motor.js";
+import { REGRAS, SINAIS } from "./regras.js";
+import { conferirLinha, explicar } from "./boleto.js";
 import { linkDoWhatsApp } from "./compartilhar.js";
 import * as T from "./textos.js";
 
-const regras = validarRegras(REGRAS);
+const base = validar(SINAIS, REGRAS);
 
 const $ = (id) => document.getElementById(id);
 
@@ -34,9 +34,10 @@ function paragrafo(texto, classe) {
   return p;
 }
 
-function mostrar(...nos) {
+function mostrar(nivel, ...nos) {
   const area = $("resultado");
   area.replaceChildren(...nos);
+  area.dataset.nivel = nivel;
   area.hidden = false;
   area.focus();
 }
@@ -44,28 +45,39 @@ function mostrar(...nos) {
 function conferirMensagem(evento) {
   evento.preventDefault();
   const texto = $("mensagem").value;
-  if (!texto.trim()) return mostrar(paragrafo(T.VAZIO));
-  const { encontrados, oQueFazer } = analisar(texto, regras);
-  if (encontrados.length === 0) {
-    return mostrar(
-      paragrafo(T.SEM_SINAL, "sem-sinal"),
-      titulo(T.TITULO_FAZER),
-      lista(T.PASSOS_GERAIS),
-    );
+  if (!texto.trim()) return mostrar("vazio", paragrafo(T.VAZIO));
+  const r = analisar(texto, base);
+  if (r.nivel === "nenhum") {
+    return mostrar("nenhum", paragrafo(T.SEM_SINAL, "resumo"), titulo(T.TITULO_FAZER), lista(T.PASSOS_GERAIS));
   }
+  const itens = r.encontrados.map(
+    (e) => `${e.nivel === "forte" ? T.PREFIXO_FORTE : T.PREFIXO_ATENCAO} — ${e.golpe}: ${e.alerta}`,
+  );
+  const passos = [...r.oQueFazer, ...T.PASSOS_GERAIS.filter((p) => !r.oQueFazer.includes(p))];
   mostrar(
+    r.nivel,
+    paragrafo(r.nivel === "forte" ? T.RESUMO_FORTE : T.RESUMO_ATENCAO, "resumo"),
     titulo(T.TITULO_SINAIS),
-    lista(encontrados.map((e) => `${e.golpe}: ${e.alerta}`)),
+    lista(itens),
     titulo(T.TITULO_FAZER),
-    lista([...oQueFazer, ...T.PASSOS_GERAIS.filter((p) => !oQueFazer.includes(p))]),
+    lista(passos),
   );
 }
 
 function conferirBoleto(evento) {
   evento.preventDefault();
-  const { status } = conferirLinha($("boleto").value);
-  if (status === "vazio") return mostrar(paragrafo(T.VAZIO));
-  mostrar(paragrafo(T.BOLETO_INDISPONIVEL), titulo(T.TITULO_FAZER), lista(T.PASSOS_GERAIS));
+  const r = conferirLinha($("boleto").value);
+  if (r.status === "vazio") return mostrar("vazio", paragrafo(T.VAZIO));
+  const { alertas, informacoes, oQueFazer } = explicar(r);
+  const nos = [];
+  if (alertas.length) {
+    nos.push(paragrafo(T.RESUMO_BOLETO_ALERTA, "resumo"), titulo(T.TITULO_SINAIS), lista(alertas));
+  } else {
+    nos.push(paragrafo(T.SEM_SINAL, "resumo"));
+  }
+  if (informacoes.length) nos.push(titulo(T.TITULO_BOLETO), lista(informacoes));
+  nos.push(titulo(T.TITULO_FAZER), lista(oQueFazer));
+  mostrar(alertas.length ? "forte" : "nenhum", ...nos);
 }
 
 async function colarEm(id) {
@@ -73,7 +85,7 @@ async function colarEm(id) {
   try {
     campo.value = await navigator.clipboard.readText();
   } catch {
-    mostrar(paragrafo(T.COLAR_SEM_PERMISSAO));
+    mostrar("vazio", paragrafo(T.COLAR_SEM_PERMISSAO));
   }
   campo.focus();
 }

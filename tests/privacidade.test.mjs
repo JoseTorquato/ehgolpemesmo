@@ -23,15 +23,29 @@ test("toda página bloqueia conexões pela política de segurança (CSP)", () =>
   }
 });
 
-test("nenhum endereço de fora, a não ser o link do WhatsApp", () => {
+// Endereços de fora só como REFERÊNCIA a fonte oficial (texto ou link que a
+// pessoa toca). Nada disso é carregado: a CSP bloqueia qualquer conexão.
+const FONTES_OFICIAIS = ["www.bcb.gov.br", "www.gov.br", "portal.febraban.org.br", "faq.whatsapp.com"];
+
+test("nenhum endereço de fora, a não ser o WhatsApp e fontes oficiais citadas", () => {
   const achados = [];
   for (const { caminho, texto } of codigo()) {
-    for (const m of texto.matchAll(/(https?:)?\/\/[a-z0-9.-]+\.[a-z]{2,}[^\s"'`)]*/gi)) {
+    for (const m of texto.matchAll(/(https?:)?\/\/([a-z0-9.-]+\.[a-z]{2,})[^\s"'`)]*/gi)) {
       if (caminho === join("js", "compartilhar.js") && m[0].startsWith("https://wa.me/")) continue;
+      if (m[1] === "https:" && FONTES_OFICIAIS.includes(m[2])) continue;
       achados.push(`${caminho}: ${m[0]}`);
     }
   }
   assert.deepEqual(achados, []);
+});
+
+test("links para fontes oficiais são só links: rel noopener noreferrer, nunca recurso", () => {
+  for (const { caminho, texto } of codigo().filter((a) => a.ext === ".html")) {
+    for (const m of texto.matchAll(/<(\w+)\b[^>]*\b(?:href|src)="https:\/\/[^"]+"[^>]*>/g)) {
+      assert.equal(m[1], "a", `${caminho}: ${m[0]}`);
+      assert.match(m[0], /rel="noopener noreferrer"/, `${caminho}: ${m[0]}`);
+    }
+  }
 });
 
 test("nenhuma chamada de rede nem armazenamento no código", () => {
