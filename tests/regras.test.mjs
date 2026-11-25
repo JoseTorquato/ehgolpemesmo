@@ -353,3 +353,13 @@ test("pagar por mim: pedido de família SEM impedimento continua sem aviso", () 
     "Vou passar na agência amanhã pra resolver a senha",
   ], "nenhum");
 });
+
+test("pagar por mim: oferta em primeira pessoa não é pedido", () => {
+  esperar([
+    "Vou passar na agência hoje pra trocar a senha, quer que eu pague a sua conta também?",
+    "Meu app travou, mas posso pagar a sua conta amanhã na agência",
+    "Deixa que eu pago o seu boleto hoje, minha senha já voltou",
+  ], "nenhum");
+  // o pedido de verdade, na mesma situação, continua avisando
+  assert.notEqual(nivel("Vou passar na agência hoje pra trocar a senha, consegue pagar a minha conta pra mim?"), "nenhum");
+});

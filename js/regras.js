@@ -190,6 +190,16 @@ export const SINAIS = {
   },
   // impedimento dito de forma mais fraca (ir à agência, senha de transação):
   // só conta junto com "pagar por mim"; sozinho com Pix não acusa ninguém
+  // quem fala se OFERECE para pagar ("quer que eu pague a sua conta?"):
+  // anula as regras de "pagar por mim"
+  "oferta-pagar": {
+    nome: "Oferece pagar por você",
+    padroes: [
+      "\\b(quer|queres|prefere|posso|deixa) que eu (pague|pago|faca|faco|transfira|mande)\\b",
+      "\\beu (pago|faco o pix|transfiro|pago pra voce|pago para voce)\\b(?:[^.!?]|\\.\\d){0,20}\\b(sua|seu|pra voce|para voce)\\b",
+      "\\b(posso|eu posso) (pagar|fazer o pix|transferir) (a sua|o seu|pra voce|para voce)\\b",
+    ],
+  },
   "impedimento-pagar": {
     nome: "Diz que o app, a senha ou a conta não funciona",
     padroes: [
@@ -545,6 +555,7 @@ export const REGRAS = [
       ["pagar-por-mim", "impedimento-pagar", "prazo-hoje"],
       ["pagar-por-mim", "impedimento-pagar", "valor-alto"],
     ],
+    exceto: ["oferta-pagar"],
     peso: 5,
     alerta: "Pede para você pagar um boleto ou um Pix por ela, dizendo que o aplicativo, a senha ou a conta não funciona, e promete devolver ou tem pressa. É um jeito comum do golpe do falso parente.",
     oQueFazer: FAZER_PAGAR_POR_MIM,
@@ -564,6 +575,7 @@ export const REGRAS = [
       ["impedimento-pagar", "urgencia"],
       ["impedimento-pagar", "prazo-hoje"],
     ],
+    exceto: ["oferta-pagar"],
     peso: 3,
     alerta: "A mensagem pede pagamento ou diz que o aplicativo, a senha ou a conta da pessoa não está funcionando.",
     oQueFazer: FAZER_PAGAR_POR_MIM,
