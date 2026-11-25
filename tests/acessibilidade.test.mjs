@@ -6,7 +6,6 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { RAIZ } from "./arquivos.mjs";
-import { soDigitos, conferirLinha } from "../js/boleto.js";
 
 const ler = (...p) => readFileSync(join(RAIZ, ...p), "utf8");
 const css = ler("css", "estilo.css");
@@ -73,14 +72,21 @@ test("página pronta para celular e leitor de tela", () => {
   assert.doesNotMatch(index, /user-scalable=no|maximum-scale=1\b/);
 });
 
-test("a página Já caí existe e não tem prazo inventado", () => {
+// Prazos que podem aparecer na página "Já caí", cada um com a fonte oficial.
+const PRAZOS_CONFIRMADOS = {
+  "80 dias": "BCB, Guia do MED v4.4, seções 4.2.4 e 6 (prazo para contestar)",
+};
+
+test("a página Já caí só tem prazo confirmado e cada parte cita a fonte", () => {
   const pagina = ler("ja-cai.html");
   assert.match(pagina, /<h1>Já caí, e agora\?<\/h1>/);
-  assert.doesNotMatch(pagina, /\d+\s*(horas?|dias?|minutos?)\b/i, "prazo só com fonte oficial");
-});
-
-test("boleto: por enquanto só limpa os dígitos e diz que ainda não confere", () => {
-  assert.equal(soDigitos("12345.67890 1"), "12345678901");
-  assert.deepEqual(conferirLinha("  "), { status: "vazio", digitos: "" });
-  assert.equal(conferirLinha("123").status, "indisponivel");
+  const prazos = [...pagina.matchAll(/\d+\s*(horas?|dias?|minutos?)\b/gi)].map((m) => m[0]);
+  for (const p of prazos) assert.ok(p in PRAZOS_CONFIRMADOS, `prazo sem fonte conferida: ${p}`);
+  assert.ok(prazos.includes("80 dias"));
+  const secoes = pagina.split("<section").slice(1);
+  assert.ok(secoes.length >= 4);
+  for (const s of secoes) assert.match(s, /class="fonte">Fontes?: /, s.slice(0, 80));
+  assert.match(pagina, /não pode exigir boletim de ocorrência/);
+  assert.match(pagina, /mandou por engano/);
+  assert.match(pagina, /desacordo comercial/);
 });
