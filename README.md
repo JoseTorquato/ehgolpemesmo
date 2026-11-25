@@ -32,7 +32,7 @@ node --test
 
 | arquivo | o que é |
 |---|---|
-| `index.html`, `ja-cai.html` | as páginas |
+| `index.html`, `ja-cai.html`, `black-friday.html` | as páginas |
 | `css/estilo.css` | estilo mobile first: letra base de 20px, contraste AA, botões de 60px |
 | `js/regras.js` | **dados**: sinais e regras dos golpes (formato descrito em `js/motor.js`) |
 | `js/motor.js` | motor: normaliza o texto, valida as regras e procura os sinais |
@@ -47,5 +47,6 @@ node --test
 - **Mensagens:** regras do falso parente (9 sinais; alerta forte só com combinação) e, mais curtas, falsa central, Pix "por engano" com devolução, empréstimo com taxa antecipada, cobrança falsa com link e pedido de código. Os roteiros vêm de fontes oficiais (MJSP/Febraban, Polícia Civil de Goiás, BCB, WhatsApp); os padrões de texto são derivados deles. `tests/regras.test.mjs` traz as mensagens de golpe e as mensagens normais usadas para medir falso alarme.
 - **Boleto:** 47 dígitos (cobrança) e 48 (arrecadação), dígitos verificadores, banco pela lista do Banco Central embarcada (`dados/ParticipantesSTR.csv`, baixada em 24/11/2026, gerada em `js/dados/bancos.js` por `node ferramentas/gerar-bancos.mjs`), valor e vencimento provável (estimativa, porque o fator de vencimento recomeçou em 22/02/2025). O resultado sempre manda conferir o nome do beneficiário no aplicativo do banco.
 - **Já caí, e agora?:** só passos confirmados em fonte oficial, com a fonte em cada parte.
+- **Black Friday: antes de comprar:** checklist de sete cuidados, só com orientação de fonte primária (CERT.br, NIC.br, Febraban, Procons, Serasa, MJSP), e link para a lista "Evite esses Sites" do Procon-SP, sem republicar a lista.
 
 O projeto é local. Repositório público e site publicado só com aprovação do José.

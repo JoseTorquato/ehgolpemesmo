@@ -90,3 +90,16 @@ test("a página Já caí só tem prazo confirmado e cada parte cita a fonte", ()
   assert.match(pagina, /mandou por engano/);
   assert.match(pagina, /desacordo comercial/);
 });
+
+test("Black Friday: os sete cuidados, cada um com fonte, e a lista do Procon-SP só como link", () => {
+  const pagina = ler("black-friday.html");
+  assert.match(pagina, /<h1>Black Friday: antes de comprar<\/h1>/);
+  const secoes = pagina.split("<section").slice(1);
+  assert.equal(secoes.filter((s) => /<h2 id="\w+">\d\. /.test(s)).length, 7);
+  for (const s of secoes) assert.match(s, /class="fonte">Fontes?/, s.slice(0, 80));
+  assert.match(pagina, /href="https:\/\/sistemas\.procon\.sp\.gov\.br\/evitesite\/list\/evitesites\.php"/);
+  assert.match(pagina, /não estar na lista não quer dizer nada/);
+  assert.match(pagina, /href="ja-cai\.html"/);
+  assert.match(pagina, /href="index\.html">conferidor/);
+  assert.match(index, /href="black-friday\.html"/);
+});

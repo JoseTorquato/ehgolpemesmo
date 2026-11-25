@@ -25,7 +25,19 @@ test("toda página bloqueia conexões pela política de segurança (CSP)", () =>
 
 // Endereços de fora só como REFERÊNCIA a fonte oficial (texto ou link que a
 // pessoa toca). Nada disso é carregado: a CSP bloqueia qualquer conexão.
-const FONTES_OFICIAIS = ["www.bcb.gov.br", "www.gov.br", "portal.febraban.org.br", "faq.whatsapp.com"];
+const FONTES_OFICIAIS = [
+  "www.bcb.gov.br",
+  "www.gov.br",
+  "portal.febraban.org.br",
+  "faq.whatsapp.com",
+  "nic.br",
+  "cartilha.cert.br",
+  "letsencrypt.org",
+  "www.serasaexperian.com.br",
+  "sistemas.procon.sp.gov.br",
+  "prefeitura.pbh.gov.br",
+  "www.pmvc.ba.gov.br",
+];
 
 test("nenhum endereço de fora, a não ser o WhatsApp e fontes oficiais citadas", () => {
   const achados = [];
