@@ -141,6 +141,7 @@ test("prévia de link (WhatsApp): og e twitter em toda página, imagem 1200×630
     }
     assert.equal(meta(texto, "og:image"), "https://josetorquato.dev/ehgolpemesmo/img/og.png", caminho);
     assert.equal(meta(texto, "twitter:card"), "summary_large_image", caminho);
+    assert.equal(meta(texto, "og:image:alt"), "É golpe mesmo? Cole a mensagem, o boleto ou o link antes de pagar.", caminho);
     assert.equal(meta(texto, "og:url"), `https://josetorquato.dev/ehgolpemesmo/${caminho === "index.html" ? "" : caminho}`, caminho);
     assert.match(texto, /<link rel="apple-touch-icon" href="img\/icone-180\.png">/, caminho);
   }
