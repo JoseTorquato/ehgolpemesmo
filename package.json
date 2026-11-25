@@ -1,0 +1,9 @@
+{
+  "name": "e-golpe",
+  "private": true,
+  "type": "module",
+  "description": "É golpe? Conferir mensagem ou boleto no próprio celular, sem enviar nada.",
+  "scripts": {
+    "test": "node --test"
+  }
+}

@@ -1,0 +1,202 @@
+/* Mobile first, letra grande, contraste alto. Sem fonte de fora: usa a do aparelho. */
+
+:root {
+  /* Pares de cor usados juntos (texto sobre fundo). O teste
+     tests/acessibilidade.test.mjs confere o contraste AA de cada par. */
+  --fundo: #ffffff;
+  --texto: #1a1a1a;
+  --texto-suave: #3d3d3d;
+  --primario: #0b4f9c;          /* botão principal: texto branco sobre ele */
+  --primario-texto: #ffffff;
+  --secundario-fundo: #e8eef7;  /* botão secundário */
+  --secundario-texto: #0b3d78;
+  --alerta-fundo: #fff4e5;      /* caixa de resultado */
+  --alerta-texto: #5c2e00;
+  --whatsapp: #0f6b3a;          /* verde escuro, com texto branco */
+  --whatsapp-texto: #ffffff;
+  --foco: #b35900;
+  --borda: #5a5a5a;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 125%; /* 20px de base, e respeita o tamanho escolhido no aparelho */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+header,
+main,
+footer {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+h1 {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 0.5rem 0;
+}
+
+h2 {
+  font-size: 1.3rem;
+  margin: 1.25rem 0 0.5rem;
+}
+
+.subtitulo,
+.privacidade,
+.nota,
+footer {
+  color: var(--texto-suave);
+}
+
+.privacidade {
+  font-weight: 600;
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem;
+}
+
+textarea,
+input {
+  width: 100%;
+  font: inherit;
+  color: var(--texto);
+  background: var(--fundo);
+  border: 2px solid var(--borda);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+button,
+.botao-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem; /* 60px: fácil de acertar com o dedo */
+  padding: 0.75rem 1.25rem;
+  font: inherit;
+  font-weight: 700;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  background: var(--primario);
+  color: var(--primario-texto);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button.secundario,
+.escolha button[aria-pressed="false"] {
+  background: var(--secundario-fundo);
+  color: var(--secundario-texto);
+  border-color: var(--secundario-texto);
+}
+
+.escolha {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.acoes {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.mais {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.botao-link.whatsapp {
+  background: var(--whatsapp);
+  color: var(--whatsapp-texto);
+}
+
+.resultado {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 2px solid var(--alerta-texto);
+  background: var(--alerta-fundo);
+  color: var(--alerta-texto);
+}
+
+.resultado h2:first-child {
+  margin-top: 0;
+}
+
+.resultado ul {
+  padding-left: 1.25rem;
+}
+
+.resultado li + li {
+  margin-top: 0.5rem;
+}
+
+.sem-sinal {
+  font-weight: 700;
+}
+
+.em-preparo {
+  font-style: italic;
+  color: var(--texto-suave);
+}
+
+a {
+  color: var(--primario);
+}
+
+:focus-visible {
+  outline: 4px solid var(--foco);
+  outline-offset: 3px;
+}
+
+.pular {
+  position: absolute;
+  left: -100vw;
+}
+
+.pular:focus {
+  left: 1rem;
+  top: 1rem;
+  background: var(--fundo);
+  padding: 0.5rem;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* telas maiores: botões lado a lado */
+@media (min-width: 36rem) {
+  .escolha,
+  .acoes {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

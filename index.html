@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Nada é carregado de fora e nada é enviado: o navegador bloqueia qualquer conexão. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>É golpe? Confira a mensagem ou o boleto antes de pagar</title>
+  <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+  <a class="pular" href="#principal">Pular para o conteúdo</a>
+  <header>
+    <h1>É golpe?</h1>
+    <p class="subtitulo">Confira uma mensagem ou um boleto antes de pagar.</p>
+  </header>
+
+  <main id="principal">
+    <p class="privacidade">O que você colar aqui fica só no seu celular. Nada é enviado para ninguém.</p>
+
+    <div class="escolha" role="group" aria-label="O que você quer conferir?">
+      <button type="button" id="aba-mensagem" aria-pressed="true" aria-controls="form-mensagem">Colar mensagem</button>
+      <button type="button" id="aba-boleto" aria-pressed="false" aria-controls="form-boleto">Colar linha do boleto</button>
+    </div>
+
+    <form id="form-mensagem" novalidate>
+      <label for="mensagem">Cole aqui a mensagem que você recebeu</label>
+      <textarea id="mensagem" rows="6" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+      <div class="acoes">
+        <button type="button" id="colar-mensagem" class="secundario">Colar</button>
+        <button type="submit">Conferir</button>
+      </div>
+    </form>
+
+    <form id="form-boleto" novalidate hidden>
+      <label for="boleto">Cole aqui a linha digitável do boleto (os números)</label>
+      <input id="boleto" type="text" inputmode="numeric" autocomplete="off" spellcheck="false">
+      <div class="acoes">
+        <button type="button" id="colar-boleto" class="secundario">Colar</button>
+        <button type="submit">Conferir</button>
+      </div>
+    </form>
+
+    <section id="resultado" class="resultado" aria-live="polite" tabindex="-1" hidden></section>
+
+    <nav class="mais" aria-label="Mais ajuda">
+      <a class="botao-link" href="ja-cai.html">Já caí, e agora?</a>
+      <a class="botao-link whatsapp" id="compartilhar" href="#" target="_blank" rel="noopener noreferrer">Avisar a família no WhatsApp</a>
+      <p class="nota">O WhatsApp recebe só um aviso para conferir antes de pagar. A mensagem que você colou não vai junto.</p>
+    </nav>
+  </main>
+
+  <footer>
+    <p>Este site não guarda nem envia nada. Ele procura sinais de golpe conhecidos; não consegue garantir nada sobre uma mensagem. Na dúvida, confirme por outro canal.</p>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
