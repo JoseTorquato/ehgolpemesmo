@@ -171,6 +171,22 @@ export function conferirLinha(texto, hoje = new Date()) {
 
 // ---- texto do resultado -----------------------------------------------------------
 
+// Mostrado em destaque, no alto, em todo boleto lido: a linha pode estar
+// certa e o golpe estar em QUEM recebe (falso parente pedindo para pagar).
+export const DESTAQUE_NOME =
+  "Antes de confirmar, o app do banco mostra o NOME de quem vai receber. Se não for a empresa que você esperava, ou se alguém pediu para você pagar por ele, pare.";
+
+// Resposta "Sim" à pergunta "Alguém te pediu para pagar este boleto por ele?"
+export const ALERTA_PAGAR_POR_MIM = {
+  golpe: "Falso parente ou amigo pedindo dinheiro",
+  alerta:
+    "Alguém pediu para você pagar este boleto por ele. É assim o golpe do falso parente: os números do boleto podem estar certos, mas o dinheiro vai para quem aplica o golpe.",
+  oQueFazer: [
+    "Antes de pagar, ligue para a pessoa no número que você já conhecia, ou fale com ela pessoalmente.",
+    "Confira no aplicativo do banco o nome de quem vai receber. Se não for quem você esperava, não pague.",
+  ],
+};
+
 export const AVISO_BENEFICIARIO =
   "Antes de pagar, confira no aplicativo do seu banco o NOME de quem vai receber (o beneficiário). Se não for a empresa que cobra, não pague.";
 export const AVISO_LINHA_VALIDA =
@@ -185,17 +201,22 @@ export const AVISO_COMPARAR_VALOR =
 export const ALERTA_NUMEROS =
   "Os números não conferem — o boleto pode ter sido adulterado ou digitado errado. Confira número por número; se continuar assim, não pague.";
 
-/** { alertas: [...], informacoes: [...], oQueFazer: [...] } para mostrar na tela. */
-export function explicar(r) {
+/**
+ * { destaque, golpe, alertas: [...], informacoes: [...], oQueFazer: [...] } para a tela.
+ * opcoes.pediramParaPagar: resposta "Sim" à pergunta da página (fica só na memória).
+ */
+export function explicar(r, opcoes = {}) {
   const alertas = [];
   const informacoes = [];
   const oQueFazer = [AVISO_BENEFICIARIO];
+  const golpe = opcoes.pediramParaPagar ? ALERTA_PAGAR_POR_MIM : null;
+  if (golpe) oQueFazer.unshift(...golpe.oQueFazer);
 
   if (r.status === "tamanho-invalido") {
     alertas.push(
       `A linha tem ${r.digitos.length} números. Um boleto tem 47 números (cobrança) ou 48 (contas de consumo e tributos, começando com 8). Confira se copiou a linha inteira.`,
     );
-    return { alertas, informacoes, oQueFazer };
+    return { destaque: null, golpe, alertas, informacoes, oQueFazer };
   }
 
   if (!r.numerosOk) alertas.push(ALERTA_NUMEROS);
@@ -222,7 +243,7 @@ export function explicar(r) {
   }
 
   oQueFazer.push(r.tipo === "cobranca" ? AVISO_COMPARAR : AVISO_COMPARAR_VALOR, AVISO_LINHA_VALIDA);
-  return { alertas, informacoes, oQueFazer };
+  return { destaque: DESTAQUE_NOME, golpe, alertas, informacoes, oQueFazer };
 }
 
 export { reais as formatarValor };

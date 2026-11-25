@@ -114,3 +114,13 @@ test("botão Voltar com pelo menos 44px, resultado com nome e favicon local", ()
   }
   assert.match(ler("favicon.svg"), /^<svg /);
 });
+
+test("pergunta do boleto: botões grandes e acessíveis, sem formulário enviado", () => {
+  assert.match(index, /<fieldset class="pergunta">\s*<legend>Alguém te pediu para pagar este boleto por ele\?<\/legend>/);
+  for (const id of ["pediu-sim", "pediu-nao"]) {
+    assert.match(index, new RegExp(`<button type="button" id="${id}"[^>]*aria-pressed="false"`), id);
+  }
+  // a resposta fica numa variável do script; nada de input enviado
+  assert.doesNotMatch(index, /name="pediu/);
+  assert.match(ler("js", "app.js"), /let pediramParaPagar = null;/);
+});

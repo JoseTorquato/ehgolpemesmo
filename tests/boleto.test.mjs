@@ -155,3 +155,34 @@ test("lista de bancos embarcada, com fonte e data", () => {
   assert.equal(FONTE_BANCOS.baixadoEm, "24/11/2026");
   assert.match(FONTE_BANCOS.url, /bcb\.gov\.br/);
 });
+
+test("destaque do nome de quem recebe em todo boleto lido, no alto do resultado", async () => {
+  const { DESTAQUE_NOME } = await import("../js/boleto.js");
+  assert.equal(
+    DESTAQUE_NOME,
+    "Antes de confirmar, o app do banco mostra o NOME de quem vai receber. Se não for a empresa que você esperava, ou se alguém pediu para você pagar por ele, pare.",
+  );
+  for (const linha of [
+    "03399.02827 03356.661243 57800.201014 8 20460000027371",
+    "00190.00009 01234.567897 01234.567178 9 16610000015000",
+    "23791.23405 00000.000984 76543.000012 8 16870000089991",
+    "99990.00004 00000.000000 00000.000000 6 16660000050000",
+    "82600000000-8 89900000202-7 61215000000-0 00012345678-2",
+    "85850000012-6 34560000202-0 61220000000-6 00098765432-2",
+  ]) {
+    assert.equal(explicar(ler(linha)).destaque, DESTAQUE_NOME, linha);
+  }
+});
+
+test("'Alguém te pediu para pagar este boleto por ele?' — Sim mostra o alerta do falso parente", async () => {
+  const { ALERTA_PAGAR_POR_MIM } = await import("../js/boleto.js");
+  const linha = "00190.00009 01234.567897 01234.567178 9 16610000015000";
+  const nao = explicar(ler(linha));
+  assert.equal(nao.golpe, null, "sem resposta ou Não: fluxo de sempre");
+  assert.equal(explicar(ler(linha), { pediramParaPagar: false }).golpe, null);
+  const sim = explicar(ler(linha), { pediramParaPagar: true });
+  assert.equal(sim.golpe, ALERTA_PAGAR_POR_MIM);
+  assert.equal(sim.golpe.golpe, "Falso parente ou amigo pedindo dinheiro");
+  assert.match(sim.oQueFazer[0], /número que você já conhecia, ou fale com ela pessoalmente/);
+  assert.ok(sim.oQueFazer.some((p) => /nome de quem vai receber/.test(p)));
+});

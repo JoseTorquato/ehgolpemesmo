@@ -76,20 +76,40 @@ function conferirMensagem(evento) {
   mostrar(r.nivel, ...nos);
 }
 
+// Resposta à pergunta "Alguém te pediu para pagar este boleto por ele?":
+// fica só nesta variável, não é enviada nem guardada.
+let pediramParaPagar = null;
+
+function responderPergunta(sim) {
+  pediramParaPagar = sim;
+  $("pediu-sim").setAttribute("aria-pressed", String(sim));
+  $("pediu-nao").setAttribute("aria-pressed", String(!sim));
+  if (!$("resultado").hidden && $("boleto").value.trim()) conferirBoleto();
+}
+
 function conferirBoleto(evento) {
-  evento.preventDefault();
+  evento?.preventDefault();
   const r = conferirLinha($("boleto").value);
   if (r.status === "vazio") return mostrar("vazio", paragrafo(T.VAZIO));
-  const { alertas, informacoes, oQueFazer } = explicar(r);
+  const { destaque, golpe, alertas, informacoes, oQueFazer } = explicar(r, {
+    pediramParaPagar: pediramParaPagar === true,
+  });
   const nos = [];
-  if (alertas.length) {
+  if (destaque) nos.push(paragrafo(destaque, "destaque"));
+  if (golpe) {
+    nos.push(
+      paragrafo(T.RESUMO_FORTE_BOLETO, "resumo"),
+      titulo(T.TITULO_SINAIS),
+      lista([`${golpe.golpe}: ${golpe.alerta}`, ...alertas]),
+    );
+  } else if (alertas.length) {
     nos.push(paragrafo(T.RESUMO_BOLETO_ALERTA, "resumo"), titulo(T.TITULO_SINAIS), lista(alertas));
   } else {
     nos.push(paragrafo(T.SEM_SINAL, "resumo"));
   }
   if (informacoes.length) nos.push(titulo(T.TITULO_BOLETO), lista(informacoes));
   nos.push(titulo(T.TITULO_FAZER), lista(oQueFazer));
-  mostrar(alertas.length ? "forte" : "nenhum", ...nos);
+  mostrar(golpe || alertas.length ? "forte" : "nenhum", ...nos);
 }
 
 async function colarEm(id) {
@@ -118,4 +138,6 @@ $("form-mensagem").addEventListener("submit", conferirMensagem);
 $("form-boleto").addEventListener("submit", conferirBoleto);
 $("colar-mensagem").addEventListener("click", () => colarEm("mensagem"));
 $("colar-boleto").addEventListener("click", () => colarEm("boleto"));
+$("pediu-sim").addEventListener("click", () => responderPergunta(true));
+$("pediu-nao").addEventListener("click", () => responderPergunta(false));
 $("compartilhar").href = linkDoWhatsApp();
