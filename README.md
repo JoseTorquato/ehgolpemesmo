@@ -55,6 +55,10 @@ node --test
 - **Já caí, e agora?:** só passos confirmados em fonte oficial, com a fonte em cada parte.
 - **Black Friday: antes de comprar:** checklist de sete cuidados, só com orientação de fonte primária (CERT.br, NIC.br, Febraban, Procons, Serasa, MJSP), e link para a lista "Evite esses Sites" do Procon-SP, sem republicar a lista.
 
+## Rolagem lateral (texto a 200%)
+
+`node ferramentas/medir-rolagem.mjs` abre as 3 páginas num Edge ou Chrome sem janela, a 375 e 320 px, com o texto a 100% e a 200%, e falha se alguma rolar para o lado. Não entra no `node --test` porque precisa do navegador; o teste `tests/acessibilidade.test.mjs` confere no CSS que as folgas laterais têm teto pela largura da tela.
+
 ## Imagem de prévia do link
 
 `img/og.png` (1200×630) é gerada localmente de `ferramentas/og.svg`, e `img/icone-180.png` de `favicon.svg`. Para gerar de novo, abra o SVG no navegador numa janela do tamanho da imagem e salve o print em PNG (no Edge headless: `msedge --headless=new --hide-scrollbars --window-size=1200,630 --screenshot=img/og.png file:///CAMINHO/ferramentas/og.svg`, que reproduz a imagem atual pixel a pixel). As metatags `og:*` e `twitter:*` de cada página apontam para `https://josetorquato.dev/ehgolpemesmo/img/og.png`; o teste confere o tamanho do PNG.

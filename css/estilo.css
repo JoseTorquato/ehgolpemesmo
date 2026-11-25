@@ -141,13 +141,15 @@ footer :focus-visible,
 
 main,
 .compartilhar {
-  /* folga nas laterais no celular; centralizado em tela grande */
-  margin-left: max(0.75rem, (100% - 40rem) / 2);
-  margin-right: max(0.75rem, (100% - 40rem) / 2);
+  /* folga nas laterais no celular; centralizado em tela grande.
+     As folgas laterais têm teto pela largura da tela (vw), e não só em rem:
+     com o texto a 200%, rem dobra e a folga comeria o espaço do conteúdo. */
+  margin-left: max(min(0.75rem, 3vw), (100% - 40rem) / 2);
+  margin-right: max(min(0.75rem, 3vw), (100% - 40rem) / 2);
   background: var(--fundo);
   border-radius: 1.25rem;
   box-shadow: 0 1rem 2.5rem var(--cartao-sombra);
-  padding: 1.25rem;
+  padding: 1.25rem min(1.25rem, 5vw);
 }
 
 .compartilhar {
@@ -177,16 +179,6 @@ footer a {
 .autoria {
   color: var(--hero-texto);
   font-weight: 700;
-}
-
-/* telas estreitas (320px): cartões quase encostados na borda */
-@media (max-width: 22rem) {
-  main,
-  .compartilhar {
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-    padding: 1rem;
-  }
 }
 
 h1 {
@@ -234,7 +226,7 @@ button,
   align-items: center;
   justify-content: center;
   min-height: 3rem; /* 60px: fácil de acertar com o dedo */
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem min(1.25rem, 4vw);
   font: inherit;
   font-weight: 700;
   border: 2px solid transparent;

@@ -139,3 +139,52 @@ test("pergunta do boleto: Sim é nível atenção e a resposta zera com outro bo
   assert.match(app, /\$\("boleto"\)\.addEventListener\("input", \(\) => \{\s*zerarPergunta\(\);\s*\$\("resultado"\)\.hidden = true;/);
   assert.doesNotMatch(ler("js", "textos.js"), /é o jeito do golpe/);
 });
+
+// Texto a 200% (rem = 40px) numa tela de 320px: as folgas laterais dos
+// cartões e dos botões não podem crescer só em rem, senão o conteúdo não cabe
+// e a página rola para o lado. A medição num navegador de verdade está em
+// ferramentas/medir-rolagem.mjs.
+function avaliarLargura(expressao, { rem, vw, cem }) {
+  const e = expressao.trim();
+  const unidade = (v) => {
+    const m = v.trim().match(/^(-?\d*\.?\d+)(rem|vw|px)$/);
+    assert.ok(m, `valor não entendido: ${v}`);
+    return Number(m[1]) * { rem, vw: vw / 100, px: 1 }[m[2]];
+  };
+  const args = (s) => {
+    const partes = [];
+    let nivel = 0, atual = "";
+    for (const c of s) {
+      if (c === "(") nivel++;
+      if (c === ")") nivel--;
+      if (c === "," && nivel === 0) { partes.push(atual); atual = ""; } else atual += c;
+    }
+    return [...partes, atual];
+  };
+  const fn = e.match(/^(min|max)\((.*)\)$/);
+  if (fn) return Math[fn[1]](...args(fn[2]).map((a) => avaliarLargura(a, { rem, vw, cem })));
+  if (/^\(100% - [\d.]+rem\) \/ 2$/.test(e)) return (cem - unidade(e.match(/- ([\d.]+rem)/)[1])) / 2;
+  return unidade(e);
+}
+
+test("texto a 200% em 320 e 375px: folgas laterais dos cartões e botões cabem na tela", () => {
+  const bloco = (seletor) => {
+    const m = css.replace(/\r\n/g, "\n").match(seletor);
+    assert.ok(m, `bloco ${seletor} não encontrado`);
+    return m[1];
+  };
+  const prop = (b, nome) => b.match(new RegExp(String.raw`(?:^|[;\s])${nome}:\s*([^;]+);`))?.[1];
+  const cartao = bloco(/\nmain,\s*\.compartilhar\s*\{([^}]*)\}/);
+  const botao = bloco(/\nbutton,\s*\.botao-link\s*\{([^}]*)\}/);
+  for (const largura of [320, 375]) {
+    const ctx = { rem: 40, vw: largura, cem: largura };
+    const margem = avaliarLargura(prop(cartao, "margin-left"), ctx) + avaliarLargura(prop(cartao, "margin-right"), ctx);
+    const padCartao = 2 * avaliarLargura(prop(cartao, "padding").split(/\s+(?![^(]*\))/)[1], ctx);
+    const padBotao = 2 * avaliarLargura(prop(botao, "padding").split(/\s+(?![^(]*\))/)[1], ctx);
+    const util = largura - margem - padCartao - padBotao;
+    // "mensagem" e "conferência", em negrito a 40px, precisam de ~230px
+    assert.ok(util >= 230, `${largura}px a 200%: sobram ${util.toFixed(0)}px para o texto do botão`);
+  }
+  // nenhuma regra de tela estreita volta a pôr folga lateral só em rem
+  assert.doesNotMatch(css, /@media[^{]*max-width[^{]*\{\s*main/);
+});
