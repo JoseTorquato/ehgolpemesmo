@@ -6,15 +6,40 @@
   <!-- Nada é carregado de fora e nada é enviado: o navegador bloqueia qualquer conexão. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
   <meta name="referrer" content="no-referrer">
-  <title>É golpe? Confira a mensagem ou o boleto antes de pagar</title>
+  <title>É golpe mesmo? Confira antes de pagar</title>
+  <meta name="description" content="Cole a mensagem, o boleto ou o link antes de pagar. Grátis, sem cadastro, e nada sai do seu celular.">
+  <meta name="theme-color" content="#0a2f66">
+  <!-- Prévia do link no WhatsApp e em redes sociais. A imagem é deste site. -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="É golpe mesmo?">
+  <meta property="og:title" content="É golpe mesmo? Confira antes de pagar">
+  <meta property="og:description" content="Cole a mensagem, o boleto ou o link antes de pagar. Grátis, sem cadastro, e nada sai do seu celular.">
+  <meta property="og:url" content="https://josetorquato.dev/ehgolpemesmo/">
+  <meta property="og:image" content="https://josetorquato.dev/ehgolpemesmo/img/og.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="É golpe mesmo? Cole a mensagem, o boleto ou o link antes de pagar.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="É golpe mesmo? Confira antes de pagar">
+  <meta name="twitter:description" content="Cole a mensagem, o boleto ou o link antes de pagar. Grátis, sem cadastro, e nada sai do seu celular.">
+  <meta name="twitter:image" content="https://josetorquato.dev/ehgolpemesmo/img/og.png">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/icone-180.png">
   <link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
   <a class="pular" href="#principal">Pular para o conteúdo</a>
-  <header>
-    <h1>É golpe?</h1>
-    <p class="subtitulo">Confira uma mensagem ou um boleto antes de pagar.</p>
+  <header class="hero">
+    <img class="logo" src="favicon.svg" alt="" width="64" height="64">
+    <h1>É golpe mesmo?</h1>
+    <p class="subtitulo">Cole a mensagem, o boleto ou o link antes de pagar.</p>
+    <ul class="selos" aria-label="Como funciona">
+      <li>Grátis</li>
+      <li>Sem cadastro</li>
+      <li>Nada sai do seu celular</li>
+    </ul>
   </header>
 
   <main id="principal">
@@ -55,15 +80,22 @@
     <nav class="mais" aria-label="Mais ajuda">
       <a class="botao-link" href="black-friday.html">Black Friday: antes de comprar</a>
       <a class="botao-link" href="ja-cai.html">Já caí, e agora?</a>
-      <a class="botao-link whatsapp" id="compartilhar" href="#" target="_blank" rel="noopener noreferrer">Avisar a família no WhatsApp</a>
-      <p class="nota">O WhatsApp recebe só um aviso para conferir antes de pagar. A mensagem que você colou não vai junto.</p>
     </nav>
   </main>
 
+  <aside class="compartilhar" aria-labelledby="titulo-compartilhar">
+    <h2 id="titulo-compartilhar">Avise quem você ama</h2>
+    <p>Mande o site para a família antes que alguém precise dele.</p>
+    <a class="botao-link whatsapp" id="compartilhar" href="#" target="_blank" rel="noopener noreferrer">Compartilhar no WhatsApp</a>
+    <p class="nota">O WhatsApp recebe só um convite com o link do site. O que você colou aqui não vai junto.</p>
+  </aside>
+
   <footer>
     <p>Este site não guarda nem envia nada. Ele procura sinais de golpe conhecidos; não consegue garantir nada sobre uma mensagem. Na dúvida, confirme por outro canal.</p>
+    <p class="autoria">Feito por José Torquato · <a href="https://github.com/JoseTorquato/ehgolpemesmo" rel="noopener noreferrer">código aberto</a></p>
   </footer>
 
+  <script type="module" src="js/pagina.js"></script>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>

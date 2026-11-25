@@ -37,6 +37,14 @@ const PARES = [
   ["alerta-texto", "alerta-fundo"],
   ["whatsapp-texto", "whatsapp"],
   ["primario", "fundo"], // links
+  // topo e rodapé, sobre as duas pontas do gradiente do fundo
+  ["hero-texto", "hero-1"],
+  ["hero-texto", "hero-2"],
+  ["hero-suave", "hero-1"],
+  ["hero-suave", "hero-2"],
+  ["marca", "hero-1"],
+  ["marca", "hero-2"],
+  ["hero-texto", "selo-fundo"],
 ];
 
 test("contraste AA (4,5:1) em todos os pares de cor", () => {

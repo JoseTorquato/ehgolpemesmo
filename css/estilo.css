@@ -16,6 +16,14 @@
   --whatsapp-texto: #ffffff;
   --foco: #b35900;
   --borda: #5a5a5a;
+  /* fundo da página (gradiente), topo e rodapé: texto claro sobre azul escuro */
+  --hero-1: #0a2f66;
+  --hero-2: #0b4d6b;
+  --hero-texto: #ffffff;
+  --hero-suave: #dce9ff;
+  --marca: #ffc83d;             /* amarelo do escudo, usado sobre --hero-1 */
+  --selo-fundo: #16437e;        /* selos do topo, texto --hero-texto */
+  --cartao-sombra: rgba(4, 20, 48, 0.35);
 }
 
 *,
@@ -31,18 +39,154 @@ html {
 
 body {
   margin: 0;
-  background: var(--fundo);
+  min-height: 100vh;
   color: var(--texto);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   line-height: 1.5;
+  /* fundo marcante, só CSS: nada é baixado de fora */
+  background-color: var(--hero-1);
+  background-image:
+    radial-gradient(circle at 90% 0, rgba(255, 200, 61, 0.22), transparent 18rem),
+    radial-gradient(circle at 0 45rem, rgba(56, 189, 248, 0.16), transparent 22rem),
+    linear-gradient(165deg, var(--hero-1) 0%, var(--hero-2) 100%);
+  background-attachment: scroll;
+  overflow-wrap: break-word;
 }
 
 header,
 main,
-footer {
+footer,
+.compartilhar {
   max-width: 40rem;
   margin: 0 auto;
   padding: 1rem;
+}
+
+/* ---- topo ---- */
+
+.hero {
+  color: var(--hero-texto);
+  padding-top: 1.5rem;
+  padding-bottom: 1.75rem;
+}
+
+.hero h1 {
+  font-size: 2.3rem;
+  letter-spacing: -0.01em;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.hero .subtitulo {
+  color: var(--hero-suave);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.hero .logo {
+  display: block;
+  width: 4rem;
+  height: 4rem;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-weight: 800;
+  color: var(--marca);
+}
+
+.marca img {
+  width: 2rem;
+  height: 2rem;
+}
+
+.hero a {
+  color: var(--hero-texto);
+}
+
+.hero :focus-visible,
+footer :focus-visible,
+.pular:focus-visible {
+  outline-color: var(--marca);
+}
+
+.selos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+
+.selos li {
+  background: var(--selo-fundo);
+  color: var(--hero-texto);
+  border: 1px solid var(--hero-suave);
+  border-radius: 999px;
+  padding: 0.25rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.selos li::before {
+  content: "✓ ";
+  color: var(--marca);
+}
+
+/* ---- cartões brancos sobre o fundo ---- */
+
+main,
+.compartilhar {
+  /* folga nas laterais no celular; centralizado em tela grande */
+  margin-left: max(0.75rem, (100% - 40rem) / 2);
+  margin-right: max(0.75rem, (100% - 40rem) / 2);
+  background: var(--fundo);
+  border-radius: 1.25rem;
+  box-shadow: 0 1rem 2.5rem var(--cartao-sombra);
+  padding: 1.25rem;
+}
+
+.compartilhar {
+  margin-top: 1.25rem;
+}
+
+.compartilhar h2 {
+  margin-top: 0;
+}
+
+.compartilhar .botao-link {
+  width: 100%;
+}
+
+/* ---- rodapé ---- */
+
+body > footer {
+  color: var(--hero-suave);
+  padding-top: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+footer a {
+  color: var(--hero-texto);
+}
+
+.autoria {
+  color: var(--hero-texto);
+  font-weight: 700;
+}
+
+/* telas estreitas (320px): cartões quase encostados na borda */
+@media (max-width: 22rem) {
+  main,
+  .compartilhar {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    padding: 1rem;
+  }
 }
 
 h1 {
@@ -97,6 +241,7 @@ button,
   border-radius: 0.5rem;
   background: var(--primario);
   color: var(--primario-texto);
+  text-align: center;
   text-decoration: none;
   cursor: pointer;
 }
