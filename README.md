@@ -13,12 +13,14 @@ Os testes de `tests/` conferem estas regras: privacidade, frases proibidas e ace
 
 ## Rodar localmente
 
-Não há build. Os módulos ES precisam ser servidos por HTTP; abrir o arquivo direto (`file://`) não funciona:
+Não há build. Os módulos ES precisam ser servidos por HTTP. **Abrir o `index.html` direto do disco (`file://`) não funciona** no Chrome e no Edge: o navegador bloqueia os módulos JS e a conferência não roda (constatado pelo Revisor no Edge, em 25/11/2026). As páginas de texto ("Já caí" e "Black Friday") abrem, mas a conferência não:
 
 ```bash
 python -m http.server 8000
 # abra http://localhost:8000 no navegador (no celular, use o modo de visualização de celular, 375 px)
 ```
+
+**Sem internet:** com a página já aberta, a conferência funciona sem rede (nada é buscado de fora). Mas o site **não abre sem internet depois de fechado**: não há service worker nem cache offline. Pendência anotada; não foi feito.
 
 ## Testes
 

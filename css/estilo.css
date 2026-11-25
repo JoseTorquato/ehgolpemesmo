@@ -166,6 +166,13 @@ a {
   outline-offset: 3px;
 }
 
+.voltar a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem; /* 55px: alvo fácil para o dedo */
+  padding: 0.25rem 0;
+}
+
 .pular {
   position: absolute;
   left: -100vw;

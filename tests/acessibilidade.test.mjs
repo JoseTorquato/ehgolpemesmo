@@ -103,3 +103,14 @@ test("Black Friday: os sete cuidados, cada um com fonte, e a lista do Procon-SP 
   assert.match(pagina, /href="index\.html">conferidor/);
   assert.match(index, /href="black-friday\.html"/);
 });
+
+test("botão Voltar com pelo menos 44px, resultado com nome e favicon local", () => {
+  const m = css.match(/\.voltar a\s*\{[^}]*min-height:\s*(\d+(?:\.\d+)?)rem/);
+  assert.ok(m, "min-height do .voltar a em rem");
+  assert.ok(Number(m[1]) * 20 >= 44, `${Number(m[1]) * 20}px`);
+  assert.match(index, /id="resultado"[^>]*aria-label="[^"]+"/);
+  for (const pagina of ["index.html", "ja-cai.html", "black-friday.html"]) {
+    assert.match(ler(pagina), /<link rel="icon" href="favicon\.svg"/, pagina);
+  }
+  assert.match(ler("favicon.svg"), /^<svg /);
+});
