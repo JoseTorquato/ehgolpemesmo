@@ -16,6 +16,14 @@
   --whatsapp-texto: #ffffff;
   --foco: #b35900;
   --borda: #5a5a5a;
+  /* fundo da página (gradiente), topo e rodapé: texto claro sobre azul escuro */
+  --hero-1: #0a2f66;
+  --hero-2: #0b4d6b;
+  --hero-texto: #ffffff;
+  --hero-suave: #dce9ff;
+  --marca: #ffc83d;             /* amarelo do escudo, usado sobre --hero-1 */
+  --selo-fundo: #16437e;        /* selos do topo, texto --hero-texto */
+  --cartao-sombra: rgba(4, 20, 48, 0.35);
 }
 
 *,
@@ -31,18 +39,146 @@ html {
 
 body {
   margin: 0;
-  background: var(--fundo);
+  min-height: 100vh;
   color: var(--texto);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   line-height: 1.5;
+  /* fundo marcante, só CSS: nada é baixado de fora */
+  background-color: var(--hero-1);
+  background-image:
+    radial-gradient(circle at 90% 0, rgba(255, 200, 61, 0.22), transparent 18rem),
+    radial-gradient(circle at 0 45rem, rgba(56, 189, 248, 0.16), transparent 22rem),
+    linear-gradient(165deg, var(--hero-1) 0%, var(--hero-2) 100%);
+  background-attachment: scroll;
+  overflow-wrap: break-word;
 }
 
 header,
 main,
-footer {
+footer,
+.compartilhar {
   max-width: 40rem;
   margin: 0 auto;
   padding: 1rem;
+}
+
+/* ---- topo ---- */
+
+.hero {
+  color: var(--hero-texto);
+  padding: 1.5rem min(1rem, 4vw) 1.75rem;
+}
+
+.hero h1 {
+  /* 46px no tamanho normal; com texto muito grande, para em 16vw
+     (60px em 375) para "mesmo?" não quebrar no meio da palavra */
+  font-size: min(2.3rem, 16vw);
+  letter-spacing: -0.01em;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.hero .subtitulo {
+  color: var(--hero-suave);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.hero .logo {
+  display: block;
+  width: 4rem;
+  height: 4rem;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-weight: 800;
+  color: var(--marca);
+}
+
+.marca img {
+  width: 2rem;
+  height: 2rem;
+}
+
+.hero a {
+  color: var(--hero-texto);
+}
+
+.hero :focus-visible,
+footer :focus-visible,
+.pular:focus-visible {
+  outline-color: var(--marca);
+}
+
+.selos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+}
+
+.selos li {
+  background: var(--selo-fundo);
+  color: var(--hero-texto);
+  border: 1px solid var(--hero-suave);
+  border-radius: 999px;
+  padding: 0.25rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.selos li::before {
+  content: "✓ ";
+  color: var(--marca);
+}
+
+/* ---- cartões brancos sobre o fundo ---- */
+
+main,
+.compartilhar {
+  /* folga nas laterais no celular; centralizado em tela grande.
+     As folgas laterais têm teto pela largura da tela (vw), e não só em rem:
+     com o texto a 200%, rem dobra e a folga comeria o espaço do conteúdo. */
+  margin-left: max(min(0.75rem, 3vw), (100% - 40rem) / 2);
+  margin-right: max(min(0.75rem, 3vw), (100% - 40rem) / 2);
+  background: var(--fundo);
+  border-radius: 1.25rem;
+  box-shadow: 0 1rem 2.5rem var(--cartao-sombra);
+  padding: 1.25rem min(1.25rem, 5vw);
+}
+
+.compartilhar {
+  margin-top: 1.25rem;
+}
+
+.compartilhar h2 {
+  margin-top: 0;
+}
+
+.compartilhar .botao-link {
+  width: 100%;
+}
+
+/* ---- rodapé ---- */
+
+body > footer {
+  color: var(--hero-suave);
+  padding: 1.5rem min(1rem, 4vw) 2rem;
+}
+
+footer a {
+  color: var(--hero-texto);
+}
+
+.autoria {
+  color: var(--hero-texto);
+  font-weight: 700;
 }
 
 h1 {
@@ -90,13 +226,14 @@ button,
   align-items: center;
   justify-content: center;
   min-height: 3rem; /* 60px: fácil de acertar com o dedo */
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem min(1.25rem, 4vw);
   font: inherit;
   font-weight: 700;
   border: 2px solid transparent;
   border-radius: 0.5rem;
   background: var(--primario);
   color: var(--primario-texto);
+  text-align: center;
   text-decoration: none;
   cursor: pointer;
 }
@@ -175,7 +312,7 @@ a {
 
 .pular {
   position: absolute;
-  left: -100vw;
+  left: -999rem; /* fora da tela mesmo com o texto grande */
 }
 
 .pular:focus {

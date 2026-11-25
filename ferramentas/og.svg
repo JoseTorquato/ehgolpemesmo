@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Fonte da prévia de link (img/og.png). Como gerar: ver README, "Imagem de prévia". -->
+  <defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a2f66"/>
+      <stop offset="1" stop-color="#0b4d6b"/>
+    </linearGradient>
+    <radialGradient id="brilho" cx="1" cy="0" r="0.6">
+      <stop offset="0" stop-color="#ffc83d" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#ffc83d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="brilho2" cx="0" cy="1" r="0.6">
+      <stop offset="0" stop-color="#38bdf8" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#fundo)"/>
+  <rect width="1200" height="630" fill="url(#brilho)"/>
+  <rect width="1200" height="630" fill="url(#brilho2)"/>
+
+  <!-- escudo grande, à direita -->
+  <g transform="translate(790 80) scale(5.5)">
+    <path d="M32 3 7 12v18c0 15.5 10.6 26.6 25 31 14.4-4.4 25-15.5 25-31V12Z" fill="#ffc83d"/>
+    <path d="M32 8 12 15.4V30c0 12.6 8.4 21.8 20 25.7C43.6 51.8 52 42.6 52 30V15.4Z" fill="#0a2f66"/>
+    <path d="M25.5 25.2c0-4 3-6.7 6.8-6.7 4 0 6.8 2.6 6.8 6.2 0 2.7-1.4 4.3-3.6 5.8-1.8 1.2-2.4 2-2.4 3.7v1.3h-4.4v-1.7c0-2.8 1-4.3 3.3-5.9 1.8-1.2 2.6-2 2.6-3.4 0-1.6-1.1-2.6-2.5-2.6-1.6 0-2.6 1.1-2.7 2.9Zm4.3 15.6a2.9 2.9 0 1 1 5.8 0 2.9 2.9 0 0 1-5.8 0Z" fill="#fff"/>
+  </g>
+
+  <g font-family="Segoe UI, system-ui, sans-serif" fill="#ffffff">
+    <text x="80" y="215" font-size="104" font-weight="800">É golpe</text>
+    <text x="80" y="330" font-size="104" font-weight="800">mesmo?</text>
+    <text x="80" y="405" font-size="38" font-weight="600" fill="#dce9ff">Cole a mensagem ou o boleto</text>
+    <text x="80" y="453" font-size="38" font-weight="600" fill="#dce9ff">antes de pagar.</text>
+
+    <g font-size="28" font-weight="700">
+      <rect x="80" y="500" width="150" height="54" rx="27" fill="#16437e" stroke="#dce9ff"/>
+      <text x="155" y="537" text-anchor="middle"><tspan fill="#ffc83d">✓</tspan> Grátis</text>
+      <rect x="246" y="500" width="232" height="54" rx="27" fill="#16437e" stroke="#dce9ff"/>
+      <text x="362" y="537" text-anchor="middle"><tspan fill="#ffc83d">✓</tspan> Sem cadastro</text>
+      <rect x="494" y="500" width="380" height="54" rx="27" fill="#16437e" stroke="#dce9ff"/>
+      <text x="684" y="537" text-anchor="middle"><tspan fill="#ffc83d">✓</tspan> Nada sai do seu celular</text>
+    </g>
+    <text x="1120" y="600" font-size="24" font-weight="600" fill="#dce9ff" text-anchor="end">josetorquato.dev/ehgolpemesmo</text>
+  </g>
+</svg>

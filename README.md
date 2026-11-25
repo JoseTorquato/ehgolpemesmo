@@ -1,4 +1,6 @@
-# É golpe?
+# É golpe mesmo?
+
+No ar em https://josetorquato.dev/ehgolpemesmo/
 
 Site gratuito e sem cadastro para conferir, no celular, se uma mensagem ou um boleto tem sinais de golpe, antes de pagar.
 
@@ -6,7 +8,7 @@ Site gratuito e sem cadastro para conferir, no celular, se uma mensagem ou um bo
 
 - **Nada sai do aparelho.** Tudo roda no navegador: sem servidor, sem IA, sem analytics, sem cookies, sem guardar o que foi colado.
 - **Nada vem de fora.** Sem CDN: fontes, scripts e estilos são do próprio site. Cada página traz uma política de segurança (CSP) que proíbe o navegador de abrir conexões (`connect-src 'none'`).
-- **Compartilhar** abre o WhatsApp só com um aviso genérico ("É golpe? Confira antes de pagar."). O conteúdo colado nunca vai junto.
+- **Compartilhar** abre o WhatsApp só com um convite genérico e o link do site (`js/compartilhar.js`). O conteúdo colado nunca vai junto.
 - **O resultado nunca dá garantia.** Sem sinal encontrado, o máximo é: "Nenhum sinal de alerta encontrado — mesmo assim, confirme por outro canal". As frases de garantia proibidas estão em `tests/frases-proibidas.test.mjs`, e o teste lê todos os arquivos do site.
 
 Os testes de `tests/` conferem estas regras: privacidade, frases proibidas e acessibilidade.
@@ -41,7 +43,9 @@ node --test
 | `js/boleto.js` | linha do boleto: dígitos verificadores, banco, valor, vencimento |
 | `js/dados/bancos.js` | lista de bancos do Banco Central (gerada; fonte e data no arquivo) |
 | `js/textos.js` | textos do resultado, num lugar só |
-| `js/compartilhar.js`, `js/config.js` | compartilhamento genérico; `URL_PUBLICA` vazio até a publicação ser aprovada |
+| `js/compartilhar.js`, `js/config.js` | convite genérico do WhatsApp, com o endereço público do site |
+| `js/pagina.js` | liga o botão "Compartilhar no WhatsApp" (todas as páginas) |
+| `img/og.png`, `img/icone-180.png` | prévia do link (1200×630) e ícone; fonte em `ferramentas/og.svg` e `favicon.svg` |
 | `js/app.js` | liga a página ao motor |
 
 ## Estado (v0.1, local)
@@ -51,4 +55,12 @@ node --test
 - **Já caí, e agora?:** só passos confirmados em fonte oficial, com a fonte em cada parte.
 - **Black Friday: antes de comprar:** checklist de sete cuidados, só com orientação de fonte primária (CERT.br, NIC.br, Febraban, Procons, Serasa, MJSP), e link para a lista "Evite esses Sites" do Procon-SP, sem republicar a lista.
 
-O projeto é local. Repositório público e site publicado só com aprovação do José.
+## Rolagem lateral (texto a 200%)
+
+`node ferramentas/medir-rolagem.mjs` abre as 3 páginas num Edge ou Chrome sem janela, a 375 e 320 px, com o texto a 100% e a 200%, e falha se alguma rolar para o lado. Não entra no `node --test` porque precisa do navegador; o teste `tests/acessibilidade.test.mjs` confere no CSS que as folgas laterais têm teto pela largura da tela.
+
+## Imagem de prévia do link
+
+`img/og.png` (1200×630) é gerada localmente de `ferramentas/og.svg`, e `img/icone-180.png` de `favicon.svg`. Para gerar de novo, abra o SVG no navegador numa janela do tamanho da imagem e salve o print em PNG (no Edge headless: `msedge --headless=new --hide-scrollbars --window-size=1200,630 --screenshot=img/og.png file:///CAMINHO/ferramentas/og.svg`, que reproduz a imagem atual pixel a pixel). As metatags `og:*` e `twitter:*` de cada página apontam para `https://josetorquato.dev/ehgolpemesmo/img/og.png`; o teste confere o tamanho do PNG.
+
+Mudanças só por branch e pull request; quem aprova e faz o merge é o José.

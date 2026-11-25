@@ -4,7 +4,6 @@
 import { analisar, validar } from "./motor.js";
 import { REGRAS, SINAIS } from "./regras.js";
 import { conferirLinha, explicar } from "./boleto.js";
-import { linkDoWhatsApp } from "./compartilhar.js";
 import * as T from "./textos.js";
 
 const base = validar(SINAIS, REGRAS);
@@ -153,4 +152,3 @@ $("boleto").addEventListener("input", () => {
 });
 $("pediu-sim").addEventListener("click", () => responderPergunta(true));
 $("pediu-nao").addEventListener("click", () => responderPergunta(false));
-$("compartilhar").href = linkDoWhatsApp();
