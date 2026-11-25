@@ -314,3 +314,42 @@ test("bloqueio com cara de banco aparece como falsa central, não como falso par
 test("contexto de banco sozinho não gera aviso (só escolhe o nome do golpe)", () => {
   assert.equal(nivel("Seu cartão novo chegou na agência, o gerente pediu para buscar."), "nenhum");
 });
+
+// ---- "pagar por mim": pede para OUTRA pessoa pagar, com app/senha/conta travada
+
+const PAGAR_POR_MIM = [
+  "Deu um imprevisto aqui. Tenho que pagar um boleto hoje mas travou no aplicativo minha senha de transação.",
+  "Hoje é o último dia que pago com desconto. Amanhã passando na agência já mando o pix.",
+  "Se eu mandar o boleto consegue pagar na sua conta? 2.100,00 o valor do boleto. Amanhã cedo passo na agência pra mudar a senha e transfiro na sua conta.",
+];
+
+test("pagar por mim: a conversa inteira dá forte, cada mensagem pelo menos atenção", () => {
+  const juntas = rodar(PAGAR_POR_MIM.join("\n"));
+  assert.equal(juntas.nivel, "forte");
+  assert.deepEqual(juntas.encontrados.map((e) => e.golpe), ["Falso parente ou amigo pedindo dinheiro"]);
+  const passos = juntas.oQueFazer.join(" ");
+  assert.match(passos, /número que você já conhecia, ou fale com ela pessoalmente/);
+  assert.match(passos, /Não pague boleto de outra pessoa sem confirmar/);
+  assert.match(passos, /beneficiário/);
+  for (const msg of PAGAR_POR_MIM) assert.notEqual(nivel(msg), "nenhum", msg);
+});
+
+test("pagar por mim: mesma classe, outras palavras", () => {
+  esperar([
+    "Oi, o app do banco travou e minha senha bloqueou. Consegue pagar esse boleto de 1.850,00 pra mim? Te devolvo amanhã",
+    "Tô sem acesso ao aplicativo, faz esse pagamento por mim hoje? Amanhã eu transfiro",
+    "Meu limite estourou, se eu te mandar o boleto você paga? É o último dia",
+  ], "forte");
+  esperar(["Travou minha senha de transação, amanhã passo na agência e te passo o pix"], "atencao");
+});
+
+test("pagar por mim: pedido de família SEM impedimento continua sem aviso", () => {
+  esperar([
+    "Paga a conta de luz que eu te devolvo",
+    "Faz um pix pra mim que te pago sexta",
+    "Pode pagar o boleto da escola pra mim? Te devolvo amanhã",
+    "Hoje é o último dia do desconto da loja, vamos?",
+    "Meu app do banco travou, depois eu vejo isso",
+    "Vou passar na agência amanhã pra resolver a senha",
+  ], "nenhum");
+});
