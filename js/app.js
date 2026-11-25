@@ -146,7 +146,11 @@ $("colar-boleto").addEventListener("click", () => {
   zerarPergunta();
   colarEm("boleto");
 });
-$("boleto").addEventListener("input", zerarPergunta);
+// outro boleto: zera a resposta e esconde o resultado do boleto anterior
+$("boleto").addEventListener("input", () => {
+  zerarPergunta();
+  $("resultado").hidden = true;
+});
 $("pediu-sim").addEventListener("click", () => responderPergunta(true));
 $("pediu-nao").addEventListener("click", () => responderPergunta(false));
 $("compartilhar").href = linkDoWhatsApp();

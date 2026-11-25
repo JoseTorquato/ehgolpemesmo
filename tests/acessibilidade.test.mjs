@@ -128,6 +128,6 @@ test("pergunta do boleto: botões grandes e acessíveis, sem formulário enviado
 test("pergunta do boleto: Sim é nível atenção e a resposta zera com outro boleto", () => {
   const app = ler("js", "app.js");
   assert.match(app, /alertas\.length \? "forte" : golpe \? "atencao" : "nenhum"/);
-  assert.match(app, /\$\("boleto"\)\.addEventListener\("input", zerarPergunta\)/);
+  assert.match(app, /\$\("boleto"\)\.addEventListener\("input", \(\) => \{\s*zerarPergunta\(\);\s*\$\("resultado"\)\.hidden = true;/);
   assert.doesNotMatch(ler("js", "textos.js"), /é o jeito do golpe/);
 });
