@@ -186,6 +186,10 @@ export const SINAIS = {
       "\\bpagar na sua conta\\b",
       "\\bfaz (esse|este) pagamento\\b",
       "\\bpode pagar (esse|este|o|um) (boleto|pix|pagamento)\\b",
+      "\\bvoce (paga|pagaria|(poderia|pode|consegue) pagar)\\b",
+      "\\bpaga-?l[oa] (pra|para|por) mim\\b",
+      "\\b(paga|pagar|pague|pagaria)\\w*\\b(?:[^.!?]|\\.\\d){0,30}\\bno meu lugar\\b",
+      "\\b(efetuar|efetue|realizar|realize)\\w* (o |esse |este |um |uma )?(pagamento|pix|transferencia)\\b(?:[^.!?]|\\.\\d){0,25}\\b(pra mim|para mim|por mim)\\b",
     ],
   },
   // impedimento dito de forma mais fraca (ir à agência, senha de transação):
@@ -208,6 +212,10 @@ export const SINAIS = {
       "\\b(passo|passar|passando|vou|ir|indo) (la )?(na|a|ate a) agencia\\b",
       "\\b(mudar|trocar|desbloquear|resetar|refazer) (a |minha )?senha\\b",
       "\\b(banco|app|aplicativo) (bloqueou|travou)\\b",
+      "\\b(conta|internet banking|app|aplicativo|cartao)\\b(?:[^.!?]){0,20}\\b(bloqueou|bloquead[oa]|bloquearam|travad[oa]|travou|suspens[oa])\\b",
+      "\\bsem acesso (a|ao|na|no) (meu |minha )?(banco|app|aplicativo|conta|internet banking)\\b",
+      "\\b(erro no|erro com o|problema no) (token|app|aplicativo|internet banking)\\b",
+      "\\b(token|app|aplicativo) (deu|da|dando|com) erro\\b",
     ],
   },
   "prazo-hoje": {

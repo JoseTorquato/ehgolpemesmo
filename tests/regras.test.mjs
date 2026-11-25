@@ -363,3 +363,31 @@ test("pagar por mim: oferta em primeira pessoa não é pedido", () => {
   // o pedido de verdade, na mesma situação, continua avisando
   assert.notEqual(nivel("Vou passar na agência hoje pra trocar a senha, consegue pagar a minha conta pra mim?"), "nenhum");
 });
+
+test("pagar por mim: pedido e impedimento ditos de outras formas", () => {
+  esperar([
+    "Poderia efetuar o pagamento por mim? O acesso ao internet banking foi bloqueado. Amanhã te devolvo",
+    "Você paga essa conta pra mim? Tô sem acesso ao meu banco, amanhã te mando de volta",
+    "Deu erro no token aqui. Consegue pagá-lo para mim hoje? É o último dia",
+    "Minha conta bloqueou, paga no meu lugar esse boleto de 1.300,00? Te devolvo amanhã",
+    "Tô com o app travado, você paga pra mim? Te pago sexta",
+  ], "forte");
+  // as versões normais parecidas
+  esperar([
+    "Você paga a conta de luz e eu pago a de água, combinado?",
+    "Minha conta bloqueou, mas já resolvi no banco",
+    "Deu erro no token, vou ligar no banco amanhã",
+    "Paga no meu lugar o pão hoje? Eu esqueci a carteira",
+  ], "nenhum");
+});
+
+test("pagar por mim: pedido e impedimento em mensagens diferentes, coladas juntas", () => {
+  const conversa = [
+    "Oi, tudo bem? Deu um problema aqui.",
+    "O aplicativo do banco travou e não consigo fazer nada.",
+    "Consegue pagar esse boleto pra mim?",
+    "Amanhã eu transfiro pra você.",
+  ];
+  for (const msg of conversa.slice(0, 1)) assert.equal(nivel(msg), "nenhum", msg);
+  assert.equal(nivel(conversa.join("\n")), "forte");
+});
