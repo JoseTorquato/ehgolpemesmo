@@ -101,3 +101,12 @@ test("ordena forte antes de atenção e não repete passos", () => {
   ]);
   assert.deepEqual(r.oQueFazer, ["passo comum", "passo A", "passo C"]);
 });
+
+test("regra com 'exceto' não vale quando o sinal listado aparece", () => {
+  const s = { ...S, "sinal-d": { nome: "D", padroes: ["palavra-d"] } };
+  const r = [{ ...R[0], exceto: ["sinal-d"] }];
+  const base = validar(s, r);
+  assert.equal(analisar("palavra-a e palavra-b", base).nivel, "forte");
+  assert.equal(analisar("palavra-a, palavra-b e palavra-d", base).nivel, "nenhum");
+  assert.throws(() => validar(s, [{ ...R[0], exceto: ["nao-existe"] }]), /exceto/);
+});

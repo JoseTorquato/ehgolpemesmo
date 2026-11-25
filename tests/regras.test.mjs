@@ -294,3 +294,23 @@ test("falsa central: texto fiel à fonte (urgência e pressão)", () => {
   assert.match(r.encontrados[0].alerta, /não usa urgência nem pressão/);
   assert.doesNotMatch(r.encontrados[0].alerta, /O banco não faz isso/);
 });
+
+test("bloqueio com cara de banco aparece como falsa central, não como falso parente", () => {
+  const banco = [
+    "Seu Pix foi bloqueado por segurança. Para liberar, faça um Pix de teste de R$ 10. Não feche esta conversa.",
+    "Central: seu cartão foi bloqueado. Faça uma transferência de R$ 50 para desbloquear.",
+  ];
+  for (const msg of banco) {
+    const r = rodar(msg);
+    assert.equal(r.nivel, "forte", msg);
+    assert.deepEqual(r.encontrados.map((e) => e.golpe), ["Falsa central do banco"], msg);
+  }
+  // o mesmo impedimento dito por um parente continua como falso parente
+  const parente = rodar("Mãe, meu pix tá bloqueado, faz um pix pra mim?");
+  assert.equal(parente.nivel, "forte");
+  assert.deepEqual(parente.encontrados.map((e) => e.golpe), ["Falso parente ou amigo pedindo dinheiro"]);
+});
+
+test("contexto de banco sozinho não gera aviso (só escolhe o nome do golpe)", () => {
+  assert.equal(nivel("Seu cartão novo chegou na agência, o gerente pediu para buscar."), "nenhum");
+});

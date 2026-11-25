@@ -18,6 +18,8 @@
 //     nivel: "forte" | "atencao",
 //     quando: [["numero-novo", "pedido-dinheiro"], ...], // basta UMA combinação
 //                                                         // com TODOS os sinais dela
+//     exceto: ["contexto-banco"],                         // opcional: a regra não vale
+//                                                         // se algum destes sinais aparecer
 //     peso: 1 a 5,                                         // ordena os alertas
 //     alerta: "texto do sinal de alerta",
 //     oQueFazer: ["passo 1", ...],
@@ -89,6 +91,11 @@ export function validar(sinais, regras) {
       for (const sinal of combinacao)
         if (!(sinal in sinais)) throw new Error(`${onde}: sinal desconhecido "${sinal}"`);
     }
+    if (r.exceto !== undefined) {
+      if (!Array.isArray(r.exceto)) throw new Error(`${onde}: "exceto" precisa ser uma lista de sinais`);
+      for (const sinal of r.exceto)
+        if (!(sinal in sinais)) throw new Error(`${onde}: sinal desconhecido "${sinal}" em "exceto"`);
+    }
     if (!Number.isInteger(r.peso) || r.peso < PESO_MINIMO || r.peso > PESO_MAXIMO)
       throw new Error(`${onde}: peso precisa ser inteiro de ${PESO_MINIMO} a ${PESO_MAXIMO}`);
     if (!Array.isArray(r.oQueFazer) || r.oQueFazer.length === 0)
@@ -121,7 +128,11 @@ export function analisar(texto, { sinais, regras }) {
   const vazio = { nivel: "nenhum", encontrados: [], oQueFazer: [], sinais: [] };
   if (!t) return vazio;
   const presentes = sinaisPresentes(t, sinais);
-  let achados = regras.filter((r) => r.quando.some((comb) => comb.every((s) => presentes.has(s))));
+  let achados = regras.filter(
+    (r) =>
+      r.quando.some((comb) => comb.every((s) => presentes.has(s))) &&
+      !(r.exceto ?? []).some((s) => presentes.has(s)),
+  );
 
   const familia = (r) => r.familia ?? r.golpe;
   const familiasFortes = new Set(achados.filter((r) => r.nivel === "forte").map(familia));

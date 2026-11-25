@@ -264,6 +264,18 @@ export const SINAIS = {
       "\\bsigilo (bancario|da operacao|da investigacao)\\b",
     ],
   },
+  // Fala como banco ou central ("seu Pix", "central", "não feche esta
+  // conversa"). Não gera aviso sozinho: só decide qual golpe é mostrado.
+  "contexto-banco": {
+    nome: "Fala como banco ou central",
+    padroes: [
+      "\\bseu (pix|cartao|conta|acesso|app|aplicativo)\\b",
+      "\\b(central|gerente|atendente)\\b",
+      "\\bsetor (de )?(seguranca|fraudes?|atendimento)\\b",
+      "\\bnao (feche|saia d)\\w* (esta|essa|da) (conversa|tela|ligacao)\\b",
+      "\\bpor (motivo de |medida de )?seguranca\\b",
+    ],
+  },
   "central-seguranca": {
     nome: "Diz ser da central de segurança",
     padroes: ["\\b(central|setor|departamento) (de )?(seguranca|fraudes?|prevencao)\\b"],
@@ -419,6 +431,7 @@ export const REGRAS = [
     familia: FAMILIA_FP,
     nivel: "forte",
     quando: [["pedido-dinheiro", "impedimento"]],
+    exceto: ["contexto-banco"], // aí é a falsa central (regra abaixo)
     peso: 5,
     alerta: "Pede dinheiro dizendo que o cartão, o limite ou o aplicativo do banco não funciona. É a desculpa clássica do golpe.",
     oQueFazer: FAZER_FALSO_PARENTE,
@@ -527,6 +540,16 @@ export const REGRAS = [
     quando: [["compra-suspeita", "ligar-numero"], ["central-seguranca", "ligar-numero"], ["central-seguranca", "compra-suspeita"]],
     peso: 5,
     alerta: "Fala de compra ou acesso que você não fez e manda ligar para um número da própria mensagem. É assim que começa o golpe da falsa central.",
+    oQueFazer: FAZER_FALSA_CENTRAL,
+  },
+  {
+    id: "falsa-central-bloqueio",
+    golpe: FALSA_CENTRAL,
+    familia: "falsa-central",
+    nivel: "forte",
+    quando: [["pedido-dinheiro", "impedimento", "contexto-banco"]],
+    peso: 5,
+    alerta: "Diz que o seu Pix, cartão ou conta foi bloqueado e pede um Pix ou pagamento para resolver. O banco nunca pede transferência para resolver problema na conta.",
     oQueFazer: FAZER_FALSA_CENTRAL,
   },
   {
