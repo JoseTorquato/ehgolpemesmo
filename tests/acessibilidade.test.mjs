@@ -73,7 +73,8 @@ test("página pronta para celular e leitor de tela", () => {
   assert.match(index, /class="pular" href="#principal"/);
   assert.match(index, />Colar mensagem</);
   assert.match(index, />Colar linha do boleto</);
-  for (const id of ["mensagem", "boleto"]) {
+  assert.match(index, />Colar link ou anúncio</);
+  for (const id of ["mensagem", "boleto", "link", "anuncio"]) {
     assert.match(index, new RegExp(`<label for="${id}">[^<]+</label>`), `campo ${id} sem rótulo`);
   }
   // sem bloqueio de zoom

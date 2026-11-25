@@ -122,12 +122,18 @@ export function sinaisPresentes(textoNormalizado, sinais) {
  * Devolve { nivel: "forte" | "atencao" | "nenhum", encontrados: [{id, golpe,
  * nivel, alerta, peso}], oQueFazer: [...], sinais: [ids] }.
  * "nenhum" quer dizer "nenhum sinal encontrado", nunca "tudo certo".
+ * `extras`: ids de sinais achados por código, fora das expressões (ex.: a
+ * conta "de R$ X por R$ Y" do anúncio). Precisam existir em `sinais`.
  */
-export function analisar(texto, { sinais, regras }) {
+export function analisar(texto, { sinais, regras }, extras = []) {
   const t = normalizar(texto);
   const vazio = { nivel: "nenhum", encontrados: [], oQueFazer: [], sinais: [] };
   if (!t) return vazio;
   const presentes = sinaisPresentes(t, sinais);
+  for (const id of extras) {
+    if (!(id in sinais)) throw new Error(`sinal desconhecido "${id}" em extras`);
+    presentes.add(id);
+  }
   let achados = regras.filter(
     (r) =>
       r.quando.some((comb) => comb.every((s) => presentes.has(s))) &&

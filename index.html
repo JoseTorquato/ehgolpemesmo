@@ -7,23 +7,23 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; form-action 'none'; base-uri 'none'">
   <meta name="referrer" content="no-referrer">
   <title>É golpe mesmo? Confira antes de pagar</title>
-  <meta name="description" content="Cole a mensagem ou o boleto antes de pagar. Grátis, sem cadastro, e nada sai do seu celular.">
+  <meta name="description" content="Cole a mensagem, o boleto ou o link antes de pagar. Grátis, sem cadastro, e nada sai do seu celular.">
   <meta name="theme-color" content="#0a2f66">
   <!-- Prévia do link no WhatsApp e em redes sociais. A imagem é deste site. -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
   <meta property="og:site_name" content="É golpe mesmo?">
   <meta property="og:title" content="É golpe mesmo? Confira antes de pagar">
-  <meta property="og:description" content="Cole a mensagem ou o boleto antes de pagar. Grátis, sem cadastro, e nada sai do seu celular.">
+  <meta property="og:description" content="Cole a mensagem, o boleto ou o link antes de pagar. Grátis, sem cadastro, e nada sai do seu celular.">
   <meta property="og:url" content="https://josetorquato.dev/ehgolpemesmo/">
   <meta property="og:image" content="https://josetorquato.dev/ehgolpemesmo/img/og.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="É golpe mesmo? Cole a mensagem ou o boleto antes de pagar.">
+  <meta property="og:image:alt" content="É golpe mesmo? Cole a mensagem, o boleto ou o link antes de pagar.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="É golpe mesmo? Confira antes de pagar">
-  <meta name="twitter:description" content="Cole a mensagem ou o boleto antes de pagar. Grátis, sem cadastro, e nada sai do seu celular.">
+  <meta name="twitter:description" content="Cole a mensagem, o boleto ou o link antes de pagar. Grátis, sem cadastro, e nada sai do seu celular.">
   <meta name="twitter:image" content="https://josetorquato.dev/ehgolpemesmo/img/og.png">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="img/icone-180.png">
@@ -34,7 +34,7 @@
   <header class="hero">
     <img class="logo" src="favicon.svg" alt="" width="64" height="64">
     <h1>É golpe mesmo?</h1>
-    <p class="subtitulo">Cole a mensagem ou o boleto antes de pagar.</p>
+    <p class="subtitulo">Cole a mensagem, o boleto ou o link antes de pagar.</p>
     <ul class="selos" aria-label="Como funciona">
       <li>Grátis</li>
       <li>Sem cadastro</li>
@@ -48,6 +48,7 @@
     <div class="escolha" role="group" aria-label="O que você quer conferir?">
       <button type="button" id="aba-mensagem" aria-pressed="true" aria-controls="form-mensagem">Colar mensagem</button>
       <button type="button" id="aba-boleto" aria-pressed="false" aria-controls="form-boleto">Colar linha do boleto</button>
+      <button type="button" id="aba-link" aria-pressed="false" aria-controls="form-link">Colar link ou anúncio</button>
     </div>
 
     <form id="form-mensagem" novalidate>
@@ -73,6 +74,21 @@
         <button type="button" id="colar-boleto" class="secundario">Colar</button>
         <button type="submit">Conferir</button>
       </div>
+    </form>
+
+    <form id="form-link" novalidate hidden>
+      <label for="link">Cole aqui o link (o endereço do site)</label>
+      <input id="link" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="acoes">
+        <button type="button" id="colar-link" class="secundario">Colar link</button>
+      </div>
+      <label for="anuncio">Ou cole o texto do anúncio ou da oferta</label>
+      <textarea id="anuncio" rows="5" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+      <div class="acoes">
+        <button type="button" id="colar-anuncio" class="secundario">Colar anúncio</button>
+        <button type="submit">Conferir</button>
+      </div>
+      <p class="nota">O link não é aberto: só o endereço é comparado com os das lojas conhecidas, aqui no seu celular. Veja também a lista <a href="https://sistemas.procon.sp.gov.br/evitesite/list/evitesites.php" rel="noopener noreferrer">"Evite esses Sites" do Procon-SP</a>. Não estar na lista não quer dizer nada: ela é pequena.</p>
     </form>
 
     <section id="resultado" class="resultado" aria-live="polite" aria-label="Resultado da conferência" tabindex="-1" hidden></section>

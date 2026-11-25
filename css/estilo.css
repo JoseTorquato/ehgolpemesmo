@@ -328,9 +328,12 @@ a {
 
 /* telas maiores: botões lado a lado */
 @media (min-width: 36rem) {
-  .escolha,
   .acoes {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .escolha {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
