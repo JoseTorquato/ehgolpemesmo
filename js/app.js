@@ -50,18 +50,30 @@ function conferirMensagem(evento) {
   if (r.nivel === "nenhum") {
     return mostrar("nenhum", paragrafo(T.SEM_SINAL, "resumo"), titulo(T.TITULO_FAZER), lista(T.PASSOS_GERAIS));
   }
-  const itens = r.encontrados.map(
-    (e) => `${e.nivel === "forte" ? T.PREFIXO_FORTE : T.PREFIXO_ATENCAO} — ${e.golpe}: ${e.alerta}`,
-  );
-  const passos = [...r.oQueFazer, ...T.PASSOS_GERAIS.filter((p) => !r.oQueFazer.includes(p))];
-  mostrar(
-    r.nivel,
-    paragrafo(r.nivel === "forte" ? T.RESUMO_FORTE : T.RESUMO_ATENCAO, "resumo"),
-    titulo(T.TITULO_SINAIS),
-    lista(itens),
-    titulo(T.TITULO_FAZER),
-    lista(passos),
-  );
+  const fortes = r.encontrados.filter((e) => e.nivel === "forte");
+  const atencoes = r.encontrados.filter((e) => e.nivel === "atencao");
+  const nos = [];
+  if (fortes.length) {
+    // só no nível forte: "Sinais de alerta encontrados" e o nome do golpe
+    nos.push(
+      paragrafo(T.RESUMO_FORTE, "resumo"),
+      titulo(T.TITULO_SINAIS),
+      lista(fortes.map((e) => `${e.golpe}: ${e.alerta}`)),
+    );
+    if (atencoes.length) nos.push(titulo(T.TITULO_TAMBEM), lista(atencoes.map((e) => e.alerta)));
+    const passos = [...r.oQueFazer, ...T.PASSOS_GERAIS.filter((p) => !r.oQueFazer.includes(p))];
+    nos.push(titulo(T.TITULO_FAZER), lista(passos));
+  } else {
+    // nível atenção: texto neutro e passos condicionais, sem acusar ninguém
+    nos.push(
+      paragrafo(T.RESUMO_ATENCAO, "resumo"),
+      titulo(T.TITULO_CONFERIR),
+      lista(atencoes.map((e) => e.alerta)),
+      titulo(T.TITULO_FAZER),
+      lista([...r.oQueFazer, T.PASSO_DUVIDA]),
+    );
+  }
+  mostrar(r.nivel, ...nos);
 }
 
 function conferirBoleto(evento) {

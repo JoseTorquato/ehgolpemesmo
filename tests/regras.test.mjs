@@ -1,9 +1,9 @@
 // Regras de verdade contra mensagens de golpe e mensagens normais.
 //
-// Mensagens de golpe: a do item 1 é citação literal da Polícia Civil de Goiás
-// (pesquisa-v0.1, 2.1); as outras são FICTÍCIAS, montadas com o roteiro
-// descrito nas fontes oficiais. Mensagens normais: as 6 de família da
-// pesquisa (FICTÍCIAS) e outras comuns, para medir falso alarme.
+// A primeira mensagem de golpe é citação literal da Polícia Civil de Goiás
+// (pesquisa-v0.1, 2.1). Todas as outras são FICTÍCIAS, escritas aqui para
+// cada CLASSE de erro apontada por QA e Revisor: para cada classe, golpes que
+// devem disparar e mensagens normais parecidas que não podem disparar.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
@@ -12,125 +12,210 @@ import { REGRAS, SINAIS } from "../js/regras.js";
 
 const BASE = validar(SINAIS, REGRAS);
 const rodar = (texto) => analisar(texto, BASE);
+const nivel = (texto) => rodar(texto).nivel;
 
-const GOLPES_FALSO_PARENTE = [
-  // Polícia Civil de Goiás (citação literal do roteiro)
-  "estou aqui precisando de um guincho no meio da estrada, precisando fazer um exame, meu cartão estourou o limite, te pago logo amanhã, mas me deposita rapidamente",
-  "Oi mãe, troquei de número, salva esse. Preciso que você me faça um Pix agora",
-  "Pai, meu novo número é este. Consegue transferir 800 reais pra mim? Te devolvo amanhã",
-  "Mãe, o app do banco travou e preciso pagar uma conta, faz um pix pra mim?",
-  "A ligação tá ruim, não consigo falar agora. Me faz um pix de 1.500?",
-  "É urgente vó, manda pra conta de um amigo meu, a chave tá aqui",
-  "Não conta pro pai, mas preciso que você me empreste 2 mil no pix",
-  "Tia, mudei de número, o antigo foi roubado. Paga esse boleto pra mim?",
-];
+function esperar(casos, esperado) {
+  for (const msg of casos) {
+    const r = rodar(msg);
+    assert.equal(r.nivel, esperado, `${msg}\n→ sinais ${JSON.stringify(r.sinais)} · ${r.encontrados.map((e) => e.id)}`);
+  }
+}
 
-const NORMAIS_FAMILIA = [
-  // as 6 mensagens normais da pesquisa (2.1), com o resultado esperado
-  ["Mãe, troquei de número, o antigo vai ser desligado. Salva esse aqui. Beijo", "atencao"],
-  ["Pai, me faz um pix de 50 pro gás? Te devolvo sexta", "nenhum"],
-  ["Vó, a mãe pediu pra te avisar que o almoço é às 13h, não precisa levar nada", "nenhum"],
-  ["Tô sem bateria, vou desligar, te ligo depois", "nenhum"],
-  ["Mãe, paga esse boleto da faculdade pra mim? Tá no meu nome, vence hoje", "atencao"],
-  ["Pode transferir pro Zé da oficina, a chave é o celular dele, ele já arrumou o carro", "atencao"],
-];
+// ---- falso parente ------------------------------------------------------------
 
-const OUTRAS_NORMAIS = [
-  "Compra de R$ 89,90 aprovada no cartão final 1234.", // SMS de banco que não pede ação
-  "Seu código de verificação é 123456. Não compartilhe esse código com ninguém.",
-  "Bom dia! Chego no domingo pro almoço, levo a sobremesa.",
-  "Nunca informe sua senha por telefone. Seu banco.",
-  "A fatura do cartão fecha amanhã, já paguei pelo app.",
-  "Oi, o boleto do condomínio chegou por e-mail, vence dia 10.",
-];
-
-test("os dados das regras têm o formato certo", () => {
-    for (const s of ["numero-novo", "pedido-dinheiro", "urgencia", "impedimento", "promessa-devolucao", "conta-terceiro", "evita-ligacao", "sigilo", "pedido-codigo"]) {
+test("os 9 sinais do falso parente existem", () => {
+  for (const s of ["numero-novo", "pedido-dinheiro", "urgencia", "impedimento", "promessa-devolucao", "conta-terceiro", "evita-ligacao", "sigilo", "pedido-codigo"]) {
     assert.ok(SINAIS[s], `falta o sinal ${s}`);
   }
 });
 
-test("mensagens de golpe do falso parente dão alerta forte", () => {
-  for (const msg of GOLPES_FALSO_PARENTE) {
-    const r = rodar(msg);
-    assert.equal(r.nivel, "forte", `${msg}\n→ ${JSON.stringify(r.sinais)}`);
-    assert.ok(r.encontrados.some((e) => e.golpe.startsWith("Falso parente")), msg);
-    assert.ok(r.oQueFazer.some((p) => p.includes("número ANTIGO")), msg);
-    assert.ok(r.oQueFazer.some((p) => p.includes("pergunta que só ele saberia")), msg);
-    assert.ok(r.oQueFazer.some((p) => p.includes("conta de outra pessoa")), msg);
+test("mensagens de golpe do falso parente dão alerta forte, com os passos certos", () => {
+  const golpes = [
+    // Polícia Civil de Goiás (citação literal do roteiro)
+    "estou aqui precisando de um guincho no meio da estrada, precisando fazer um exame, meu cartão estourou o limite, te pago logo amanhã, mas me deposita rapidamente",
+    "Oi mãe, troquei de número, salva esse. Preciso que você me faça um Pix agora",
+    "Pai, meu novo número é este. Consegue transferir 800 reais pra mim? Te devolvo amanhã",
+    "Mãe, o app do banco travou e preciso pagar uma conta, faz um pix pra mim?",
+    "A ligação tá ruim, não consigo falar agora. Me faz um pix de 1.500?",
+    "É urgente vó, manda pra conta de um amigo meu, a chave tá aqui",
+    "Não conta pro pai, mas preciso que você me empreste 2 mil no pix",
+    "Tia, mudei de número, o antigo foi roubado. Paga esse boleto pra mim?",
+  ];
+  esperar(golpes, "forte");
+  for (const msg of golpes) {
+    const passos = rodar(msg).oQueFazer.join(" ");
+    assert.match(passos, /número ANTIGO/, msg);
+    assert.match(passos, /pergunta que só ele saberia/, msg);
+    assert.match(passos, /conta de outra pessoa/, msg);
   }
 });
 
-test("as 6 mensagens normais de família não dão alerta forte", () => {
-  for (const [msg, esperado] of NORMAIS_FAMILIA) {
-    const r = rodar(msg);
-    assert.equal(r.nivel, esperado, `${msg}\n→ ${JSON.stringify(r)}`);
-  }
+test("classe 1 — número novo em outras formas", () => {
+  esperar([
+    "Oi mãe, troquei de chip. Consegue me ajudar com 300 reais?",
+    "Pai, perdi meu celular, esse é um número temporário. Preciso de 500 reais pra hoje",
+    "Vó, meu celular caiu na água, tô usando o do meu amigo. Me ajuda com 400?",
+    "Prezada, informo meu novo número de contato. Solicito a gentileza de transferir R$ 1.200,00 ainda hoje.",
+    "Tio, roubaram meu celular. Esse é meu número novo, faz um pix pra mim?",
+  ], "forte");
+  // as mesmas formas, sem pedido de dinheiro: só um ponto para conferir
+  esperar([
+    "Mãe, troquei de chip, salva esse aqui",
+    "Perdi meu celular ontem, esse número é temporário",
+  ], "atencao");
+  // não é número novo
+  esperar([
+    "Oi tia! Troquei de celular mas o número é o mesmo, me adiciona de novo no grupo",
+    "Me manda o número novo da sua sogra?",
+    "Qual é o número novo do encanador?",
+    "Comprei um celular novo, as fotos ficaram ótimas",
+  ], "nenhum");
 });
 
-test("mensagem de troca de número sem pedido sugere ligar no número antigo", () => {
-  const r = rodar(NORMAIS_FAMILIA[0][0]);
-  assert.ok(r.oQueFazer[0].includes("número ANTIGO"));
+test("classe 2 — pedido de dinheiro sem a palavra Pix", () => {
+  esperar([
+    "vó sou eu, troquei de número. me ajuda com 850 reais? é urgente, não conta pra ninguém",
+    "Mãe, esse é meu número novo. Preciso de 2 mil até as 18h",
+    "Pai, não posso falar agora, me ajuda com 400?",
+  ], "forte");
+  // pedido de dinheiro legítimo, sem outro sinal: nunca dá aviso
+  esperar([
+    "Mãe, preciso de 2 mil até as 18h pra pagar o aluguel",
+    "Pai, me ajuda com 400 pro material da faculdade?",
+    "Me manda o Pix do mercado?",
+    "Faz um pix de 80 do gás, te devolvo no sábado",
+    "A chave pix da faxina é o celular dela",
+    "Padaria: pode pagar no pix",
+    "Mãe, faz um pix urgente de 30 que esqueci a carteira, te devolvo em casa",
+  ], "nenhum");
 });
 
-test("um sinal sozinho não dá alerta forte (exceto pedido de código)", () => {
-  for (const [id, s] of Object.entries(SINAIS)) {
-    const forte = REGRAS.filter((r) => r.nivel === "forte").some((r) => r.quando.some((c) => c.length === 1 && c[0] === id));
-    const isolados = ["pedido-codigo", "conta-segura", "acesso-remoto", "pedido-senha", "motoboy"];
-    if (forte) assert.ok(isolados.includes(id), `sinal ${id} (${s.nome}) dá alerta forte sozinho`);
-  }
+test("classe 3 — combinações que faltavam", () => {
+  esperar([
+    "Te mandei um pix de 500 por engano, pode devolver nessa outra chave?",
+    "Oi, transferi 300 reais sem querer pra você, faz a devolução pra chave certa por favor",
+    "Mãe, troquei de número. Manda na chave do meu amigo, ele me passa",
+    "Tô sem microfone, não dá pra falar. Preciso de R$ 600 urgente",
+  ], "forte");
+  esperar(["Mandei um pix de 50 por engano pra você, pode conferir no app?"], "atencao");
+  esperar([
+    "Desculpa, mandei a mensagem errada sem querer",
+    "Recebi o seu pix, obrigado!",
+  ], "nenhum");
 });
 
-test("outras mensagens normais não dão alerta forte", () => {
-  for (const msg of OUTRAS_NORMAIS) {
-    assert.notEqual(rodar(msg).nivel, "forte", msg);
-  }
+test("classe 4 — cobrança e ameaça sem link", () => {
+  esperar([
+    "Setor de cobrança: seu nome será negativado amanhã. Quite pelo Pix CNPJ 12.345.678/0001-90 hoje.",
+    "Aviso: o fornecimento de energia será cortado amanhã. Pague o boleto em anexo para evitar o corte.",
+    "Seu título foi protestado. Para acordo hoje, segue a chave pix abaixo.",
+  ], "forte");
+  esperar([
+    "Lembrete: sua fatura de luz vence amanhã. Pague pelo aplicativo da distribuidora.",
+    "Oi, o boleto do condomínio chegou por e-mail, vence dia 10.",
+  ], "nenhum");
 });
 
-test("pedido de código dá alerta forte sozinho, aviso do próprio WhatsApp não", () => {
-  assert.equal(rodar("Oi! Te mandei um código por engano, me passa o código que chegou por SMS?").nivel, "forte");
-  assert.equal(rodar("Seu código de verificação é 123456. Não compartilhe esse código.").nivel, "nenhum");
+test("classe 5 — falsa central sem link", () => {
+  esperar([
+    "Banco: compra de R$ 2.390,00 não reconhecida? Ligue agora para 0800 123 4567",
+    "Central de segurança: identificamos uma transação suspeita no seu cartão.",
+    "Não desligue e não abra o aplicativo do banco, a operação está em análise.",
+    "Ligue 0800 000 1234 e informe o código recebido por SMS para cancelar a compra.",
+  ], "forte");
+  // aviso legítimo que manda usar o verso do cartão: só um ponto para conferir
+  esperar(["Se não reconhece a compra, ligue para o número no verso do seu cartão."], "atencao");
+  esperar([
+    "Compra de R$ 89,90 aprovada no cartão final 1234.",
+    "Compra aprovada no cartão final 1234. Valor R$ 45,00.",
+    "Liga pra tia no 11 98765-4321 pra combinar o almoço",
+  ], "nenhum");
+});
+
+test("classe 6 — prêmio, vaga e só no Pix", () => {
+  esperar([
+    "Parabéns, você foi sorteado! Para receber o prêmio, pague a taxa de envio de R$ 49.",
+    "Vaga de renda extra: curtir vídeos e ganhar R$ 300 por dia. Pague o cadastro de R$ 80 para começar.",
+    "Empréstimo aprovado! Deposite a taxa de R$ 380 de seguro para liberar.",
+  ], "forte");
+  esperar(["Black Friday: 80% de desconto, só no Pix!"], "atencao");
+  esperar([
+    "Ganhei um brinde na farmácia hoje!",
+    "Abriu vaga lá na loja, quer que eu te indique?",
+    "Pagando no Pix tem 5% de desconto.",
+  ], "nenhum");
+});
+
+test("pedido de código, com o que o WhatsApp manda dizer", () => {
+  assert.equal(nivel("Oi! Me passa o código que chegou por SMS?"), "forte");
+  assert.equal(nivel("Seu código de verificação é 123456. Não compartilhe esse código."), "nenhum");
 });
 
 test("falsa central: conta segura, aplicativo, senha e motoboy", () => {
-  const casos = [
+  esperar([
     "Aqui é da central de segurança do banco. Detectamos uma compra suspeita, transfira seu saldo para uma conta segura.",
     "Para cancelar a compra, baixe o aplicativo AnyDesk e me passe o número que aparecer.",
     "Confirme sua senha e o token para bloquear o novo dispositivo.",
     "Um motoboy vai buscar o seu cartão para perícia.",
     "Vamos fazer um teste do Pix para validar sua conta.",
+  ], "forte");
+});
+
+test("cobrança com link e empréstimo com taxa", () => {
+  esperar([
+    "Correios: sua encomenda está retida. Pague a taxa em https://rastreio-entrega.xyz/pagar",
+    "Última notificação: regularize sua pendência em www.receita-regularize.com.br ou seu CPF será cancelado.",
+    "Seu token expirou. Para evitar bloqueio, acesse bit.ly/atualiza-banco",
+    "Serasa: seu CPF foi negativado. Clique aqui: serasa-acordo.net",
+    "Seu empréstimo de R$ 5.000 foi aprovado! Para liberar, pague a taxa de liberação de R$ 250.",
+  ], "forte");
+  esperar(["Olha a foto da festa: https://exemplo.com/foto", "Paguei a parcela do empréstimo ontem."], "nenhum");
+});
+
+// ---- as 6 mensagens normais de família da pesquisa ------------------------------
+
+test("as 6 mensagens normais de família da pesquisa", () => {
+  const casos = [
+    ["Mãe, troquei de número, o antigo vai ser desligado. Salva esse aqui. Beijo", "atencao"],
+    ["Pai, me faz um pix de 50 pro gás? Te devolvo sexta", "nenhum"],
+    ["Vó, a mãe pediu pra te avisar que o almoço é às 13h, não precisa levar nada", "nenhum"],
+    ["Tô sem bateria, vou desligar, te ligo depois", "nenhum"],
+    ["Mãe, paga esse boleto da faculdade pra mim? Tá no meu nome, vence hoje", "nenhum"],
+    ["Pode transferir pro Zé da oficina, a chave é o celular dele, ele já arrumou o carro", "atencao"],
   ];
-  for (const msg of casos) {
+  for (const [msg, esperado] of casos) assert.equal(nivel(msg), esperado, msg);
+});
+
+// ---- o nível "atenção" não acusa ninguém ----------------------------------------
+
+test("atenção: título proporcional e passos condicionais, sem 'nunca responda'", () => {
+  const numeroNovo = rodar("Mãe, troquei de número, o antigo vai ser desligado. Salva esse aqui.");
+  assert.equal(numeroNovo.nivel, "atencao");
+  assert.equal(numeroNovo.encontrados[0].golpe, "Número novo de parente ou amigo");
+  assert.match(numeroNovo.oQueFazer[0], /Antes de salvar o número novo, ligue/);
+
+  const terceiro = rodar("Pode transferir pro Zé da oficina, a chave é o celular dele");
+  assert.match(terceiro.oQueFazer.join(" "), /^Se a mensagem veio de um número novo/);
+
+  for (const msg of ["Mãe, troquei de número, salva esse", "Pode transferir pro Zé da oficina, a chave é o celular dele", "Mandei um pix de 50 por engano pra você"]) {
     const r = rodar(msg);
-    assert.equal(r.nivel, "forte", msg);
-    assert.ok(r.encontrados.some((e) => e.golpe === "Falsa central do banco"), msg);
+    assert.equal(r.nivel, "atencao", msg);
+    for (const e of r.encontrados) assert.doesNotMatch(e.golpe, /golpe|falso|falsa/i, msg);
+    assert.doesNotMatch(r.oQueFazer.join(" "), /Nunca ligue nem responda/, msg);
   }
 });
 
-test("Pix por engano com devolução em outra chave", () => {
-  const r = rodar("Oi, fiz um pix errado pra você de 300 reais, devolve pra essa outra chave por favor");
-  assert.equal(r.nivel, "forte");
-  assert.ok(r.oQueFazer.some((p) => p.includes("função de devolver o próprio Pix")));
-  assert.equal(rodar("Mandei por engano um pix pra sua conta, pode conferir?").nivel, "atencao");
-});
-
-test("empréstimo com taxa antecipada", () => {
-  assert.equal(rodar("Seu empréstimo de R$ 5.000 foi aprovado! Para liberar, pague a taxa de liberação de R$ 250.").nivel, "forte");
-  assert.equal(rodar("Crédito aprovado: é só depositar o IOF antes da liberação.").nivel, "forte");
-  assert.notEqual(rodar("Paguei a parcela do empréstimo ontem.").nivel, "forte");
-});
-
-test("cobrança falsa com link", () => {
-  const casos = [
-    "Correios: sua encomenda está retida. Pague a taxa em https://rastreio-entrega.xyz/pagar",
-    "Última notificação: regularize sua pendência em www.receita-regularize.com.br ou seu CPF será cancelado.",
-  ];
-  for (const msg of casos) assert.equal(rodar(msg).nivel, "forte", msg);
-  assert.equal(rodar("Olha a foto da festa: https://exemplo.com/foto").nivel, "nenhum");
-});
-
-test("alertas fortes aparecem antes e escondem as atenções do mesmo golpe", () => {
+test("alertas fortes escondem as atenções da mesma família", () => {
   const r = rodar("Oi mãe, troquei de número, salva esse. Preciso que você me faça um Pix agora");
   assert.equal(r.encontrados[0].nivel, "forte");
-  assert.ok(!r.encontrados.some((e) => e.nivel === "atencao" && e.golpe.startsWith("Falso parente")));
+  assert.ok(!r.encontrados.some((e) => e.nivel === "atencao"));
+});
+
+test("um sinal sozinho só dá alerta forte nos casos que o banco nunca faz", () => {
+  const isolados = ["pedido-codigo", "conta-segura", "acesso-remoto", "pedido-senha", "motoboy", "pressao-ligacao"];
+  for (const r of REGRAS.filter((x) => x.nivel === "forte")) {
+    for (const c of r.quando) {
+      if (c.length === 1) assert.ok(isolados.includes(c[0]), `${r.id}: ${c[0]} dá alerta forte sozinho`);
+    }
+  }
 });

@@ -13,7 +13,8 @@
 // REGRAS — combinações de sinais que formam um golpe:
 //   {
 //     id: "falso-parente-numero-novo",
-//     golpe: "Falso parente",
+//     golpe: "Falso parente",           // nome mostrado no nível forte
+//     familia: "falso-parente",         // opcional: agrupa regras do mesmo assunto
 //     nivel: "forte" | "atencao",
 //     quando: [["numero-novo", "pedido-dinheiro"], ...], // basta UMA combinação
 //                                                         // com TODOS os sinais dela
@@ -22,8 +23,8 @@
 //     oQueFazer: ["passo 1", ...],
 //   }
 //
-// Quando um golpe tem alerta forte, os alertas de "atenção" do mesmo golpe
-// não aparecem (seriam repetição).
+// Quando uma família tem alerta forte, os alertas de "atenção" da mesma
+// família não aparecem (seriam repetição). Sem "familia", vale o "golpe".
 
 export const PESO_MINIMO = 1;
 export const PESO_MAXIMO = 5;
@@ -77,6 +78,8 @@ export function validar(sinais, regras) {
     for (const campo of ["golpe", "alerta"])
       if (typeof r[campo] !== "string" || !r[campo].trim())
         throw new Error(`${onde}: falta o texto "${campo}"`);
+    if (r.familia !== undefined && (typeof r.familia !== "string" || !r.familia.trim()))
+      throw new Error(`${onde}: familia precisa ser um texto`);
     if (!NIVEIS.includes(r.nivel)) throw new Error(`${onde}: nivel precisa ser ${NIVEIS.join(" ou ")}`);
     if (!Array.isArray(r.quando) || r.quando.length === 0)
       throw new Error(`${onde}: precisa de pelo menos uma combinação em "quando"`);
@@ -120,8 +123,9 @@ export function analisar(texto, { sinais, regras }) {
   const presentes = sinaisPresentes(t, sinais);
   let achados = regras.filter((r) => r.quando.some((comb) => comb.every((s) => presentes.has(s))));
 
-  const golpesFortes = new Set(achados.filter((r) => r.nivel === "forte").map((r) => r.golpe));
-  achados = achados.filter((r) => r.nivel === "forte" || !golpesFortes.has(r.golpe));
+  const familia = (r) => r.familia ?? r.golpe;
+  const familiasFortes = new Set(achados.filter((r) => r.nivel === "forte").map(familia));
+  achados = achados.filter((r) => r.nivel === "forte" || !familiasFortes.has(familia(r)));
 
   const ordemNivel = (r) => (r.nivel === "forte" ? 0 : 1);
   achados.sort((a, b) => ordemNivel(a) - ordemNivel(b) || b.peso - a.peso || a.id.localeCompare(b.id));

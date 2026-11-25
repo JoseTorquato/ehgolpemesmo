@@ -8,11 +8,13 @@ export const TITULO_FAZER = "O que fazer agora";
 export const TITULO_BOLETO = "O que a linha do boleto mostra";
 
 export const RESUMO_FORTE = "Cuidado: esta mensagem tem sinais fortes de golpe.";
-export const RESUMO_ATENCAO = "Atenção: há pontos para conferir antes de fazer qualquer coisa.";
+// nível "atenção": sem nome de golpe e sem "sinais de alerta"
+export const RESUMO_ATENCAO = "Alguns pontos para conferir antes de pagar ou responder.";
+export const TITULO_CONFERIR = "Antes de pagar, confira";
+export const TITULO_TAMBEM = "Também confira";
+export const PASSO_DUVIDA = "Na dúvida, peça ajuda a alguém de confiança antes de fazer qualquer pagamento.";
 export const RESUMO_BOLETO_ALERTA = "Cuidado: esta linha de boleto tem problemas.";
 
-export const PREFIXO_FORTE = "Alerta forte";
-export const PREFIXO_ATENCAO = "Atenção";
 
 export const SEM_SINAL =
   "Nenhum sinal de alerta encontrado — mesmo assim, confirme por outro canal.";
