@@ -66,12 +66,13 @@ footer,
 
 .hero {
   color: var(--hero-texto);
-  padding-top: 1.5rem;
-  padding-bottom: 1.75rem;
+  padding: 1.5rem min(1rem, 4vw) 1.75rem;
 }
 
 .hero h1 {
-  font-size: 2.3rem;
+  /* 46px no tamanho normal; com texto muito grande, para em 16vw
+     (60px em 375) para "mesmo?" não quebrar no meio da palavra */
+  font-size: min(2.3rem, 16vw);
   letter-spacing: -0.01em;
   margin: 0.5rem 0 0.25rem;
 }
@@ -168,8 +169,7 @@ main,
 
 body > footer {
   color: var(--hero-suave);
-  padding-top: 1.5rem;
-  padding-bottom: 2rem;
+  padding: 1.5rem min(1rem, 4vw) 2rem;
 }
 
 footer a {
@@ -312,7 +312,7 @@ a {
 
 .pular {
   position: absolute;
-  left: -100vw;
+  left: -999rem; /* fora da tela mesmo com o texto grande */
 }
 
 .pular:focus {
