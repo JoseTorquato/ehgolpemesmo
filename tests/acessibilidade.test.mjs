@@ -59,6 +59,7 @@ const PARES = [
   ["texto-suave", "pagina"],
   ["primario", "pagina"],
   ["texto-suave", "secundario-fundo"],
+  ["borda", "fundo"], // borda do "Colar" e dos campos (componente: mínimo 3:1; aqui passa 4,5:1)
 ];
 
 test("contraste AA (4,5:1) em todos os pares de cor", () => {

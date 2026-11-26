@@ -144,7 +144,7 @@ a {
 }
 
 .hero .logo {
-  display: block;
+  display: none; /* o escudo já está na ilustração (computador) */
   width: 2.4rem;
   height: 2.4rem;
 }
@@ -192,7 +192,7 @@ footer :focus-visible,
   border: 1px solid rgba(220, 233, 255, 0.5);
   border-radius: 999px;
   padding: 0.15rem 0.6rem;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: 700;
 }
 
@@ -278,7 +278,6 @@ main > section:first-of-type > h2:first-child {
   gap: 0.4rem;
   align-items: flex-start;
   font-weight: 600;
-  font-size: 0.9rem;
   margin-bottom: 1.2rem;
 }
 
@@ -341,7 +340,7 @@ button,
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  min-height: 3rem; /* 60px + borda = 64px: fácil de acertar com o dedo */
+  min-height: 3.2rem; /* 64px: fácil de acertar com o dedo */
   padding: 0.75rem min(1.2rem, 4vw);
   font: inherit;
   font-weight: 700;
@@ -427,7 +426,7 @@ button.secundario,
   gap: 0.2rem;
   min-height: 3rem;
   padding: 0.4rem 0.2rem;
-  font-size: 0.85rem;
+  font-size: 1rem;
   line-height: 1.2;
   background: transparent;
   color: var(--secundario-texto);
@@ -528,6 +527,23 @@ button.secundario,
 
 .resultado h2 {
   font-size: 1.15rem;
+}
+
+.resultado:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.resultado[data-nivel="forte"]:focus-visible {
+  outline-color: var(--forte-cor);
+}
+
+.resultado[data-nivel="atencao"]:focus-visible {
+  outline-color: var(--atencao-cor);
+}
+
+.resultado[data-nivel="nenhum"]:focus-visible,
+.resultado[data-nivel="vazio"]:focus-visible {
+  outline-color: var(--nenhum-cor);
 }
 
 .resultado h2:first-child {
@@ -822,7 +838,7 @@ footer a {
     background: none;
     border: 0;
     padding: 0;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--hero-suave);
   }
 
@@ -836,7 +852,6 @@ footer a {
   }
 
   .privacidade {
-    font-size: 0.85rem;
     margin-bottom: 0.8rem;
   }
 
@@ -853,7 +868,8 @@ footer a {
 /* ---- ajustes do celular (revisão dos prints) ---- */
 .abas [role="tab"] {
   padding: 0.4rem min(0.4rem, 2vw);
-  font-size: min(0.85rem, 4.4vw);
+  /* 20px onde cabe; em tela estreita, nunca abaixo de 18px */
+  font-size: max(0.9rem, min(1rem, 4.8vw));
 }
 
 @media (max-width: 39.99rem) {
@@ -870,5 +886,75 @@ footer a {
   .atalho-icone .icone {
     width: 1.6rem;
     height: 1.6rem;
+  }
+}
+
+/* abas: largura pelo conteúdo ("Mensagem" ganha mais espaço que "Boleto");
+   com o texto grande, quebram para a linha de baixo */
+.abas {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.abas [role="tab"] {
+  /* base 0: dividem o espaço por igual, mas nunca menos que a palavra mais
+     longa do rótulo; se não couberem, vão para a linha de baixo */
+  flex: 1 1 0;
+  padding-left: min(0.4rem, 2vw);
+  padding-right: min(0.4rem, 2vw);
+}
+
+/* ---- revisão do PR #5 ---- */
+
+/* índice do catálogo: alvo de 64px */
+.indice a {
+  min-height: 3.2rem;
+}
+
+/* "Colar": borda com pelo menos 3:1 sobre o branco, para não parecer desativado */
+.colar {
+  border-color: var(--borda);
+}
+
+/* aba escolhida: fundo cheio, azul com texto branco */
+.abas [role="tab"][aria-selected="true"] {
+  background: var(--primario);
+  color: var(--primario-texto);
+  border-color: var(--primario);
+}
+
+/* atenção: triângulo (o forte é um círculo com "!") */
+.resultado[data-nivel="atencao"] .resumo::before {
+  border-radius: 0;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  padding-top: 0.3rem;
+  font-size: 0.9rem;
+}
+
+/* selos: uma linha de texto também no computador */
+.selos {
+  gap: 0 0.4rem;
+}
+
+.selos li {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 0.9rem;
+  color: var(--hero-suave);
+}
+
+.selos li::before {
+  content: "";
+}
+
+.selos li:not(:last-child)::after {
+  content: " ·";
+  color: var(--hero-suave);
+}
+
+@media (min-width: 60rem) {
+  .selos li {
+    font-size: 1rem;
   }
 }
