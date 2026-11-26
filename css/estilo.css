@@ -857,3 +857,35 @@ footer a {
   padding: 0.2rem;
   gap: 0.2rem;
 }
+
+/* ---- ajustes do celular (revisão dos prints) ---- */
+.abas [role="tab"] {
+  padding: 0.4rem min(0.4rem, 2vw);
+  font-size: min(0.85rem, 4.4vw);
+}
+
+@media (max-width: 39.99rem) {
+  /* rótulo em linha inteira; "Colar" à direita, logo abaixo dele */
+  .campo-topo label {
+    flex-basis: 100%;
+  }
+
+  .campo-topo .colar {
+    margin-left: auto;
+  }
+
+  /* cartões de navegação: ícone maior, alinhado ao título */
+  .atalho {
+    align-items: flex-start;
+  }
+
+  .atalho-icone {
+    width: min(2.8rem, 14vw);
+    height: min(2.8rem, 14vw);
+  }
+
+  .atalho-icone .icone {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+}
