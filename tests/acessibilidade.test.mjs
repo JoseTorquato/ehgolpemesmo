@@ -45,6 +45,20 @@ const PARES = [
   ["marca", "hero-1"],
   ["marca", "hero-2"],
   ["hero-texto", "selo-fundo"],
+  // v2: ação principal, abas, resultado por nível e fundo da página
+  ["acao-texto", "acao"],
+  ["secundario-texto", "fundo"], // "Colar" e abas não escolhidas sobre branco
+  ["primario", "secundario-fundo"], // ícones e abas sobre o trilho
+  ["forte-texto", "forte-fundo"],
+  ["atencao-texto", "atencao-fundo"],
+  ["nenhum-texto", "nenhum-fundo"],
+  ["fundo", "forte-cor"], // ícone "!" do nível forte
+  ["fundo", "atencao-cor"],
+  ["fundo", "nenhum-cor"],
+  ["texto", "pagina"],
+  ["texto-suave", "pagina"],
+  ["primario", "pagina"],
+  ["texto-suave", "secundario-fundo"],
 ];
 
 test("contraste AA (4,5:1) em todos os pares de cor", () => {
@@ -71,9 +85,22 @@ test("página pronta para celular e leitor de tela", () => {
   assert.match(index, /name="viewport" content="width=device-width, initial-scale=1"/);
   assert.match(index, /id="resultado"[^>]*aria-live="polite"/);
   assert.match(index, /class="pular" href="#principal"/);
-  assert.match(index, />Colar mensagem</);
-  assert.match(index, />Colar linha do boleto</);
-  assert.match(index, />Colar link ou anúncio</);
+  // abas de verdade: "escolha o tipo", não botão de ação
+  assert.match(index, /<div class="abas" role="tablist" aria-labelledby="abas-titulo">/);
+  for (const [id, nome] of [["mensagem", "Mensagem"], ["boleto", "Boleto"], ["link", "Link ou anúncio"]]) {
+    assert.match(
+      index,
+      new RegExp(`<button type="button" role="tab" id="aba-${id}" aria-selected="(true|false)" aria-controls="form-${id}"[^>]*>.*<span>${nome}</span></button>`),
+      id,
+    );
+    assert.match(index, new RegExp(`<form id="form-${id}" class="painel" role="tabpanel" aria-labelledby="aba-${id}"`), id);
+  }
+  assert.equal((index.match(/aria-selected="true"/g) ?? []).length, 1, "uma aba escolhida");
+  // uma só ação principal por formulário
+  assert.equal((index.match(/<button type="submit" class="conferir">/g) ?? []).length, 3);
+  const app = ler("js", "app.js");
+  assert.match(app, /aba\.setAttribute\("aria-selected", String\(ativo\)\)/);
+  assert.match(app, /ArrowRight/);
   for (const id of ["mensagem", "boleto", "link", "anuncio"]) {
     assert.match(index, new RegExp(`<label for="${id}">[^<]+</label>`), `campo ${id} sem rótulo`);
   }

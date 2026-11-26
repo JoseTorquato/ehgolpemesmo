@@ -78,5 +78,5 @@ test("o que a pesquisa marcou como não confirmado fica de fora", () => {
 });
 
 test("a página tem link no conferidor", () => {
-  assert.match(index, /<a class="botao-link" href="golpes\.html">/);
+  assert.match(index, /<a class="atalho" href="golpes\.html">/);
 });

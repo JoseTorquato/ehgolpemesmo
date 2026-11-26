@@ -1,29 +1,53 @@
-/* Mobile first, letra grande, contraste alto. Sem fonte de fora: usa a do aparelho. */
+/* Mobile first, letra grande, contraste alto. Sem fonte de fora: usa a do aparelho.
+
+   Sistema visual (v2):
+   - espaçamento em múltiplos de 8px: 0.4rem = 8px na letra base de 20px
+     (8, 16, 24, 32, 48, 64 → 0.4, 0.8, 1.2, 1.6, 2.4, 3.2rem);
+   - cantos: 0.6rem (12px) em campos e botões, 1.2rem (24px) em cartões;
+   - uma só ação principal por tela: o botão "Conferir", amarelo da marca;
+   - resultado: forte = vermelho, atenção = âmbar, nenhum sinal = cinza-azulado
+     (nunca verde: "nenhum sinal" não é "seguro"). */
 
 :root {
   /* Pares de cor usados juntos (texto sobre fundo). O teste
      tests/acessibilidade.test.mjs confere o contraste AA de cada par. */
   --fundo: #ffffff;
-  --texto: #1a1a1a;
-  --texto-suave: #3d3d3d;
-  --primario: #0b4f9c;          /* botão principal: texto branco sobre ele */
+  --pagina: #eef2f8;             /* fundo da página, atrás dos cartões */
+  --texto: #14213d;
+  --texto-suave: #3f4b63;
+  --primario: #0b4f9c;           /* links e aba escolhida */
   --primario-texto: #ffffff;
-  --secundario-fundo: #e8eef7;  /* botão secundário */
+  --secundario-fundo: #e6edf7;   /* trilho das abas, botões leves */
   --secundario-texto: #0b3d78;
-  --alerta-fundo: #fff4e5;      /* caixa de resultado */
+  --acao: #ffc83d;               /* "Conferir": a única ação principal */
+  --acao-texto: #10213f;
+  --acao-borda: #e0a800;
+  --alerta-fundo: #fff4e5;
   --alerta-texto: #5c2e00;
-  --whatsapp: #0f6b3a;          /* verde escuro, com texto branco */
+  --forte-fundo: #fdecea;        /* resultado: sinais fortes */
+  --forte-texto: #6b1209;
+  --forte-cor: #b3261e;
+  --atencao-fundo: #fff4e0;      /* resultado: atenção */
+  --atencao-texto: #5c2e00;
+  --atencao-cor: #a35200;
+  --nenhum-fundo: #eef2f7;       /* resultado: nenhum sinal (neutro, nunca verde) */
+  --nenhum-texto: #1f2d40;
+  --nenhum-cor: #4a5d78;
+  --whatsapp: #0f6b3a;
   --whatsapp-texto: #ffffff;
   --foco: #b35900;
-  --borda: #5a5a5a;
-  /* fundo da página (gradiente), topo e rodapé: texto claro sobre azul escuro */
+  --borda: #5a6b85;
+  --linha: #d5deea;
+  /* topo e rodapé: texto claro sobre azul escuro */
   --hero-1: #0a2f66;
   --hero-2: #0b4d6b;
   --hero-texto: #ffffff;
   --hero-suave: #dce9ff;
-  --marca: #ffc83d;             /* amarelo do escudo, usado sobre --hero-1 */
-  --selo-fundo: #16437e;        /* selos do topo, texto --hero-texto */
-  --cartao-sombra: rgba(4, 20, 48, 0.35);
+  --marca: #ffc83d;
+  --selo-fundo: #16437e;
+  --sombra-1: 0 0.1rem 0.2rem rgba(10, 30, 60, 0.06), 0 0.4rem 1.2rem rgba(10, 30, 60, 0.08);
+  --sombra-2: 0 0.2rem 0.4rem rgba(10, 30, 60, 0.06), 0 1.2rem 2.4rem rgba(10, 30, 60, 0.14);
+  --cartao-sombra: rgba(4, 20, 48, 0.2);
 }
 
 *,
@@ -41,67 +65,106 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--texto);
+  background: var(--pagina);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   line-height: 1.5;
-  /* fundo marcante, só CSS: nada é baixado de fora */
-  background-color: var(--hero-1);
-  background-image:
-    radial-gradient(circle at 90% 0, rgba(255, 200, 61, 0.22), transparent 18rem),
-    radial-gradient(circle at 0 45rem, rgba(56, 189, 248, 0.16), transparent 22rem),
-    linear-gradient(165deg, var(--hero-1) 0%, var(--hero-2) 100%);
-  background-attachment: scroll;
   overflow-wrap: break-word;
 }
 
-header,
-main,
-footer,
-.compartilhar {
-  max-width: 40rem;
-  margin: 0 auto;
-  padding: 1rem;
+h1,
+h2,
+h3 {
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
-/* ---- topo ---- */
+h1 {
+  font-size: 2rem;
+  margin: 0.4rem 0;
+}
+
+h2 {
+  font-size: 1.3rem;
+  margin: 1.6rem 0 0.8rem;
+}
+
+p {
+  margin: 0 0 0.8rem;
+}
+
+a {
+  color: var(--primario);
+  text-underline-offset: 0.15em;
+}
+
+:focus-visible {
+  outline: 4px solid var(--foco);
+  outline-offset: 3px;
+}
+
+.icone {
+  width: 1.2em;
+  height: 1.2em;
+  flex: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ---- topo (faixa azul) ---- */
 
 .hero {
   color: var(--hero-texto);
-  padding: 1.5rem min(1rem, 4vw) 1.75rem;
+  background-color: var(--hero-1);
+  background-image:
+    radial-gradient(circle at 92% 0, rgba(255, 200, 61, 0.22), transparent 18rem),
+    radial-gradient(circle at 0 100%, rgba(56, 189, 248, 0.16), transparent 20rem),
+    linear-gradient(160deg, var(--hero-1) 0%, var(--hero-2) 100%);
+  /* o cartão branco sobe por cima do fim da faixa */
+  padding: 1.6rem min(1.2rem, 4vw) 4rem;
+}
+
+.hero-dentro {
+  max-width: 60rem;
+  margin: 0 auto;
 }
 
 .hero h1 {
-  /* 46px no tamanho normal; com texto muito grande, para em 16vw
-     (60px em 375) para "mesmo?" não quebrar no meio da palavra */
-  font-size: min(2.3rem, 16vw);
-  letter-spacing: -0.01em;
-  margin: 0.5rem 0 0.25rem;
+  /* com texto muito grande, para em 15vw para "mesmo?" não quebrar no meio */
+  font-size: min(2.2rem, 15vw);
+  margin: 0.4rem 0 0.4rem;
 }
 
 .hero .subtitulo {
   color: var(--hero-suave);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
   margin: 0;
 }
 
 .hero .logo {
   display: block;
-  width: 4rem;
-  height: 4rem;
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
+.ilustracao {
+  display: none;
 }
 
 .marca {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   margin: 0;
   font-weight: 800;
   color: var(--marca);
 }
 
 .marca img {
-  width: 2rem;
-  height: 2rem;
+  width: 1.6rem;
+  height: 1.6rem;
 }
 
 .hero a {
@@ -117,19 +180,19 @@ footer :focus-visible,
 .selos {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.4rem;
   list-style: none;
   padding: 0;
-  margin: 1rem 0 0;
+  margin: 0.8rem 0 0;
 }
 
 .selos li {
   background: var(--selo-fundo);
   color: var(--hero-texto);
-  border: 1px solid var(--hero-suave);
+  border: 1px solid rgba(220, 233, 255, 0.5);
   border-radius: 999px;
-  padding: 0.25rem 0.8rem;
-  font-size: 0.9rem;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.8rem;
   font-weight: 700;
 }
 
@@ -138,23 +201,41 @@ footer :focus-visible,
   color: var(--marca);
 }
 
-/* ---- cartões brancos sobre o fundo ---- */
+.voltar {
+  margin: 0.4rem 0 0;
+}
+
+.voltar a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem; /* 55px: alvo fácil para o dedo */
+  padding: 0.2rem 0;
+  font-weight: 700;
+}
+
+/* ---- cartões brancos ---- */
 
 main,
 .compartilhar {
   /* folga nas laterais no celular; centralizado em tela grande.
      As folgas laterais têm teto pela largura da tela (vw), e não só em rem:
      com o texto a 200%, rem dobra e a folga comeria o espaço do conteúdo. */
-  margin-left: max(min(0.75rem, 3vw), (100% - 40rem) / 2);
-  margin-right: max(min(0.75rem, 3vw), (100% - 40rem) / 2);
+  margin-left: max(min(0.75rem, 3vw), (100% - 46rem) / 2);
+  margin-right: max(min(0.75rem, 3vw), (100% - 46rem) / 2);
   background: var(--fundo);
-  border-radius: 1.25rem;
-  box-shadow: 0 1rem 2.5rem var(--cartao-sombra);
-  padding: 1.25rem min(1.25rem, 5vw);
+  border-radius: 1.2rem;
+  box-shadow: var(--sombra-2);
+  padding: 1.6rem min(1.2rem, 5vw);
+}
+
+main {
+  position: relative;
+  margin-top: -2.4rem;
 }
 
 .compartilhar {
-  margin-top: 1.25rem;
+  margin-top: 1.6rem;
+  box-shadow: var(--sombra-1);
 }
 
 .compartilhar h2 {
@@ -165,48 +246,68 @@ main,
   width: 100%;
 }
 
-/* ---- rodapé ---- */
-
-body > footer {
-  color: var(--hero-suave);
-  padding: 1.5rem min(1rem, 4vw) 2rem;
+/* páginas internas: as seções viram cartões com respiro entre elas */
+main > section:not(.card):not(.resultado) {
+  padding-bottom: 1.6rem;
+  border-bottom: 1px solid var(--linha);
 }
 
-footer a {
-  color: var(--hero-texto);
+main > section:not(.card):not(.resultado):last-of-type {
+  border-bottom: 0;
+  padding-bottom: 0;
 }
 
-.autoria {
-  color: var(--hero-texto);
-  font-weight: 700;
+main > section > h2:first-child {
+  margin-top: 1.6rem;
 }
 
-h1 {
-  font-size: 2rem;
-  line-height: 1.2;
-  margin: 0.5rem 0;
+main > section:first-of-type > h2:first-child {
+  margin-top: 0;
 }
 
-h2 {
-  font-size: 1.3rem;
-  margin: 1.25rem 0 0.5rem;
-}
+/* ---- textos ---- */
 
 .subtitulo,
 .privacidade,
-.nota,
-footer {
+.nota {
   color: var(--texto-suave);
 }
 
 .privacidade {
+  display: flex;
+  gap: 0.4rem;
+  align-items: flex-start;
   font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 1.2rem;
 }
+
+.privacidade .icone {
+  color: var(--primario);
+  margin-top: 0.15em;
+}
+
+.nota {
+  font-size: 0.9rem;
+  margin-top: 1.2rem;
+}
+
+.fonte {
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+.em-preparo {
+  font-style: italic;
+  color: var(--texto-suave);
+}
+
+/* ---- campos ---- */
 
 label {
   display: block;
   font-weight: 700;
-  margin: 1rem 0 0.5rem;
+  margin: 1.2rem 0 0.4rem;
 }
 
 textarea,
@@ -216,21 +317,43 @@ input {
   color: var(--texto);
   background: var(--fundo);
   border: 2px solid var(--borda);
-  border-radius: 0.5rem;
-  padding: 0.75rem;
+  border-radius: 0.6rem;
+  padding: 0.6rem min(0.8rem, 3vw);
 }
+
+textarea:focus,
+input:focus {
+  border-color: var(--primario);
+}
+
+.campo-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0 0.8rem;
+  margin-top: 1.2rem;
+}
+
+.campo-topo label {
+  flex: 1 1 8rem;
+  margin: 0 0 0.4rem;
+}
+
+/* ---- botões ---- */
 
 button,
 .botao-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 3rem; /* 60px: fácil de acertar com o dedo */
-  padding: 0.75rem min(1.25rem, 4vw);
+  gap: 0.4rem;
+  min-height: 3rem; /* 60px + borda = 64px: fácil de acertar com o dedo */
+  padding: 0.75rem min(1.2rem, 4vw);
   font: inherit;
   font-weight: 700;
   border: 2px solid transparent;
-  border-radius: 0.5rem;
+  border-radius: 0.6rem;
   background: var(--primario);
   color: var(--primario-texto);
   text-align: center;
@@ -238,29 +361,51 @@ button,
   cursor: pointer;
 }
 
+/* a ação principal: grande, amarela, uma por formulário */
+.conferir {
+  width: 100%;
+  margin-top: 1.6rem;
+  min-height: 3.4rem;
+  font-size: 1.2rem;
+  background: var(--acao);
+  color: var(--acao-texto);
+  border-color: var(--acao-borda);
+  box-shadow: 0 0.2rem 0 var(--acao-borda);
+}
+
+.conferir:hover {
+  filter: brightness(1.04);
+}
+
+.conferir:active {
+  transform: translateY(0.1rem);
+  box-shadow: none;
+}
+
+/* "Colar": ação secundária, discreta, junto do campo */
+.colar {
+  background: transparent;
+  color: var(--secundario-texto);
+  border-color: var(--linha);
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+.colar:hover {
+  background: var(--secundario-fundo);
+}
+
 button.secundario,
-.escolha button[aria-pressed="false"] {
+.opcao {
   background: var(--secundario-fundo);
   color: var(--secundario-texto);
   border-color: var(--secundario-texto);
 }
 
-.escolha {
-  display: grid;
-  gap: 0.75rem;
-  margin: 1rem 0;
-}
-
-.acoes {
-  display: grid;
-  gap: 0.75rem;
-  margin-top: 0.75rem;
-}
-
-.mais {
-  display: grid;
-  gap: 0.75rem;
-  margin-top: 2rem;
+.opcao[aria-pressed="true"] {
+  background: var(--primario);
+  color: var(--primario-texto);
+  border-color: var(--primario);
 }
 
 .botao-link.whatsapp {
@@ -268,14 +413,126 @@ button.secundario,
   color: var(--whatsapp-texto);
 }
 
+/* ---- abas: "escolha o tipo", não ação ---- */
+
+.abas-titulo {
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+}
+
+.abas {
+  display: grid;
+  /* três lado a lado; com o texto grande, uma embaixo da outra */
+  grid-template-columns: repeat(auto-fit, minmax(4.4em, 1fr));
+  gap: 0.4rem;
+  padding: 0.4rem;
+  background: var(--secundario-fundo);
+  border-radius: 0.9rem;
+}
+
+.abas [role="tab"] {
+  flex-direction: column;
+  gap: 0.2rem;
+  min-height: 3rem;
+  padding: 0.4rem 0.2rem;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  background: transparent;
+  color: var(--secundario-texto);
+  border: 2px solid transparent;
+  border-radius: 0.6rem;
+}
+
+.abas [role="tab"] .icone {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.abas [role="tab"][aria-selected="true"] {
+  background: var(--fundo);
+  color: var(--primario);
+  border-color: var(--primario);
+  box-shadow: var(--sombra-1);
+}
+
+.abas [role="tab"]:hover {
+  border-color: var(--linha);
+}
+
+/* ---- pergunta do boleto ---- */
+
+.pergunta {
+  border: 0;
+  padding: 0;
+  margin: 1.2rem 0 0;
+}
+
+.pergunta legend {
+  font-weight: 700;
+  padding: 0;
+  margin-bottom: 0.4rem;
+}
+
+.sim-nao {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(5em, 1fr));
+  gap: 0.8rem;
+}
+
+/* ---- resultado ---- */
+
 .resultado {
-  margin-top: 1.5rem;
+  margin-top: 1.6rem;
   /* folga lateral com teto pela largura da tela (texto a 200% em 320px) */
-  padding: 1rem min(1rem, 3vw);
-  border-radius: 0.5rem;
-  border: 2px solid var(--alerta-texto);
-  background: var(--alerta-fundo);
-  color: var(--alerta-texto);
+  padding: 1.2rem min(1rem, 3vw);
+  border-radius: 0.9rem;
+  border: 2px solid var(--nenhum-cor);
+  border-left-width: min(0.4rem, 2vw);
+  background: var(--nenhum-fundo);
+  color: var(--nenhum-texto);
+}
+
+.resultado[data-nivel="forte"] {
+  border-color: var(--forte-cor);
+  background: var(--forte-fundo);
+  color: var(--forte-texto);
+}
+
+.resultado[data-nivel="atencao"] {
+  border-color: var(--atencao-cor);
+  background: var(--atencao-fundo);
+  color: var(--atencao-texto);
+}
+
+/* ícone do nível, antes do resumo (só CSS, nada é baixado) */
+.resultado[data-nivel] .resumo::before {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-right: 0.4rem;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 800;
+  vertical-align: 0.1em;
+  color: var(--fundo);
+  background: var(--nenhum-cor);
+  content: "i";
+}
+
+.resultado[data-nivel="forte"] .resumo::before {
+  background: var(--forte-cor);
+  content: "!";
+}
+
+.resultado[data-nivel="atencao"] .resumo::before {
+  background: var(--atencao-cor);
+  content: "!";
+}
+
+.resultado h2 {
+  font-size: 1.15rem;
 }
 
 .resultado h2:first-child {
@@ -287,28 +544,103 @@ button.secundario,
 }
 
 .resultado li + li {
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;
 }
 
-.em-preparo {
-  font-style: italic;
-  color: var(--texto-suave);
+.resumo {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-top: 0;
 }
 
-a {
+.destaque {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 0;
+  padding: 0.8rem min(0.8rem, 3vw);
+  border: 3px solid var(--alerta-texto);
+  border-radius: 0.6rem;
+  background: var(--fundo);
+  color: var(--texto);
+}
+
+/* ---- atalhos: cartões de navegação, diferentes da ação principal ---- */
+
+.atalhos {
+  display: grid;
+  gap: 0.8rem;
+  margin: 1.6rem max(min(0.75rem, 3vw), (100% - 46rem) / 2) 0;
+}
+
+.atalho {
+  display: flex;
+  align-items: center;
+  gap: min(0.8rem, 3vw);
+  min-height: 3.2rem;
+  padding: 0.8rem min(1rem, 4vw);
+  background: var(--fundo);
+  border: 1px solid var(--linha);
+  border-radius: 1.2rem;
+  box-shadow: var(--sombra-1);
+  color: var(--texto);
+  text-decoration: none;
+}
+
+.atalho:hover {
+  border-color: var(--primario);
+}
+
+.atalho-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: min(2.4rem, 12vw);
+  height: min(2.4rem, 12vw);
+  border-radius: 0.8rem;
+  background: var(--secundario-fundo);
   color: var(--primario);
 }
 
-:focus-visible {
-  outline: 4px solid var(--foco);
-  outline-offset: 3px;
+.atalho-texto {
+  display: grid;
+  min-width: 0;
+  gap: 0.1rem;
 }
 
-.voltar a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem; /* 55px: alvo fácil para o dedo */
-  padding: 0.25rem 0;
+.atalho-texto strong {
+  color: var(--primario);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.atalho-texto span {
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+/* ---- rodapé ---- */
+
+body > footer {
+  margin-top: 3.2rem;
+  color: var(--hero-suave);
+  background: var(--hero-1);
+  padding: 2.4rem min(1.2rem, 4vw) 3.2rem;
+}
+
+body > footer > * {
+  max-width: 46rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+footer a {
+  color: var(--hero-texto);
+}
+
+.autoria {
+  color: var(--hero-texto);
+  font-weight: 700;
 }
 
 .pular {
@@ -319,68 +651,9 @@ a {
 .pular:focus {
   left: 1rem;
   top: 1rem;
+  z-index: 2;
   background: var(--fundo);
   padding: 0.5rem;
-}
-
-[hidden] {
-  display: none !important;
-}
-
-/* telas maiores: botões lado a lado */
-@media (min-width: 36rem) {
-  .acoes {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .escolha {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * {
-    transition: none !important;
-    animation: none !important;
-  }
-}
-
-.destaque {
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin-top: 0;
-  padding: 0.75rem min(0.75rem, 3vw);
-  border: 3px solid var(--alerta-texto);
-  border-radius: 0.5rem;
-  background: var(--fundo);
-  color: var(--texto);
-}
-
-.pergunta {
-  border: 0;
-  padding: 0;
-  margin: 1rem 0 0;
-}
-
-.pergunta legend {
-  font-weight: 700;
-  padding: 0;
-}
-
-.pergunta button[aria-pressed="true"] {
-  background: var(--primario);
-  color: var(--primario-texto);
-}
-
-.resumo {
-  font-weight: 700;
-  font-size: 1.1rem;
-  margin-top: 0;
-}
-
-.fonte {
-  font-size: 0.9rem;
-  color: var(--texto-suave);
 }
 
 /* ---- catálogo de golpes (golpes.html) ---- */
@@ -401,16 +674,17 @@ a {
 .card {
   /* bordas e folgas laterais com teto pela largura da tela: com o texto a
      200% em 320px, em rem elas comiam o espaço e partiam as palavras */
-  border: 2px solid var(--secundario-fundo);
+  border: 1px solid var(--linha);
   border-left: min(0.4rem, 1.5vw) solid var(--primario);
-  border-radius: 0.75rem;
-  padding: 0.25rem min(1rem, 3vw) 0.75rem;
-  margin-top: 1.5rem;
+  border-radius: 0.9rem;
+  padding: 0.4rem min(1rem, 3vw) 0.8rem;
+  margin-top: 1.6rem;
+  box-shadow: var(--sombra-1);
 }
 
 .card h3 {
   font-size: 1.1rem;
-  margin: 1rem 0 0.25rem;
+  margin: 1.2rem 0 0.4rem;
 }
 
 .card ol,
@@ -419,17 +693,111 @@ a {
 }
 
 .card li + li {
-  margin-top: 0.35rem;
+  margin-top: 0.4rem;
 }
 
 .numero {
   font-weight: 700;
-  padding: 0.75rem min(0.75rem, 3vw);
-  border-radius: 0.5rem;
+  padding: 0.8rem min(0.8rem, 3vw);
+  border-radius: 0.6rem;
   background: var(--alerta-fundo);
   color: var(--alerta-texto);
 }
 
 .titulo-secao {
-  margin-top: 2.5rem;
+  margin-top: 2.4rem;
+}
+
+/* ---- telas maiores ---- */
+
+@media (min-width: 40rem) {
+  .atalhos {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .atalho {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* computador: topo em duas colunas, com a ilustração */
+@media (min-width: 60rem) {
+  .hero {
+    padding-top: 3.2rem;
+    padding-bottom: 6rem;
+  }
+
+  .hero-dentro {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    align-items: center;
+    gap: 2.4rem;
+  }
+
+  .inicio .hero h1 {
+    font-size: 3rem;
+  }
+
+  .inicio .hero .subtitulo {
+    font-size: 1.3rem;
+  }
+
+  .ilustracao {
+    display: block;
+    width: 100%;
+    max-width: 20rem;
+    height: auto;
+    justify-self: end;
+  }
+
+  main {
+    margin-top: -4rem;
+    padding: 2.4rem 3.2rem;
+  }
+
+  .compartilhar {
+    padding: 2.4rem 3.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* páginas internas: o conteúdo do topo fica na mesma coluna do cartão */
+.hero > :not(.hero-dentro) {
+  max-width: 46rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero > h1 {
+  margin-top: 0.8rem;
+}
+
+/* índice do catálogo: atalhos em grade, não lista solta */
+.indice h2 {
+  margin-top: 0;
+}
+
+.indice ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(11rem, 100%), 1fr));
+  gap: 0.4rem;
+}
+
+.indice a {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--linha);
+  border-radius: 0.6rem;
+  background: var(--pagina);
+  text-decoration: none;
+}
+
+.indice a:hover {
+  border-color: var(--primario);
 }

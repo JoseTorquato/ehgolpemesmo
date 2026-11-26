@@ -175,14 +175,32 @@ async function colarEm(id) {
   campo.focus();
 }
 
-function escolher(qual) {
-  for (const nome of ["mensagem", "boleto", "link"]) {
+const ABAS = ["mensagem", "boleto", "link"];
+
+// Abas (role="tab"): a escolhida fica marcada e é a única na ordem do Tab;
+// as setas mudam de aba, como num controle de abas comum.
+function escolher(qual, { focarCampo = true } = {}) {
+  for (const nome of ABAS) {
     const ativo = nome === qual;
-    $(`aba-${nome}`).setAttribute("aria-pressed", String(ativo));
+    const aba = $(`aba-${nome}`);
+    aba.setAttribute("aria-selected", String(ativo));
+    aba.tabIndex = ativo ? 0 : -1;
     $(`form-${nome}`).hidden = !ativo;
   }
   $("resultado").hidden = true;
-  $(qual).focus();
+  if (focarCampo) $(qual).focus();
+}
+
+for (const nome of ABAS) {
+  $(`aba-${nome}`).addEventListener("keydown", (e) => {
+    const passo = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    if (!passo && e.key !== "Home" && e.key !== "End") return;
+    e.preventDefault();
+    const i = ABAS.indexOf(nome);
+    const proxima = e.key === "Home" ? ABAS[0] : e.key === "End" ? ABAS.at(-1) : ABAS[(i + passo + ABAS.length) % ABAS.length];
+    escolher(proxima, { focarCampo: false });
+    $(`aba-${proxima}`).focus();
+  });
 }
 
 $("aba-mensagem").addEventListener("click", () => escolher("mensagem"));
