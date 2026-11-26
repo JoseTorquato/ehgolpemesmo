@@ -518,17 +518,17 @@ button.secundario,
   vertical-align: 0.1em;
   color: var(--fundo);
   background: var(--nenhum-cor);
-  content: "i";
+  content: "i" / ""; /* "/ \"\"": o leitor de tela não lê o ícone */
 }
 
 .resultado[data-nivel="forte"] .resumo::before {
   background: var(--forte-cor);
-  content: "!";
+  content: "!" / "";
 }
 
 .resultado[data-nivel="atencao"] .resumo::before {
   background: var(--atencao-cor);
-  content: "!";
+  content: "!" / "";
 }
 
 .resultado h2 {
