@@ -80,20 +80,20 @@
     </div>
 
     <form id="form-mensagem" class="painel" role="tabpanel" aria-labelledby="aba-mensagem" novalidate>
-      <div class="campo-topo">
-        <label for="mensagem">Cole aqui a mensagem que você recebeu</label>
+      <label for="mensagem">Cole aqui a mensagem que você recebeu</label>
+      <textarea id="mensagem" rows="6" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+      <div class="campo-acoes">
         <button type="button" id="colar-mensagem" class="colar"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2h6a1 1 0 0 1 1 1v1h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V3a1 1 0 0 1 1-1Zm1 2v2h4V4ZM6 6v14h12V6h-2v1a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V6Z" fill="currentColor"/></svg>Colar</button>
       </div>
-      <textarea id="mensagem" rows="6" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
       <button type="submit" class="conferir">Conferir<svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.3 5.3a1 1 0 0 1 1.4 0l6 6a1 1 0 0 1 0 1.4l-6 6a1 1 0 1 1-1.4-1.4l4.3-4.3H4a1 1 0 1 1 0-2h13.6l-4.3-4.3a1 1 0 0 1 0-1.4Z" fill="currentColor"/></svg></button>
     </form>
 
     <form id="form-boleto" class="painel" role="tabpanel" aria-labelledby="aba-boleto" novalidate hidden>
-      <div class="campo-topo">
-        <label for="boleto">Cole aqui a linha digitável do boleto (os números)</label>
+      <label for="boleto">Cole aqui a linha digitável do boleto (os números)</label>
+      <input id="boleto" type="text" inputmode="numeric" autocomplete="off" spellcheck="false">
+      <div class="campo-acoes">
         <button type="button" id="colar-boleto" class="colar"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2h6a1 1 0 0 1 1 1v1h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V3a1 1 0 0 1 1-1Zm1 2v2h4V4ZM6 6v14h12V6h-2v1a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V6Z" fill="currentColor"/></svg>Colar</button>
       </div>
-      <input id="boleto" type="text" inputmode="numeric" autocomplete="off" spellcheck="false">
       <fieldset class="pergunta">
         <legend>Alguém te pediu para pagar este boleto por ele?</legend>
         <div class="sim-nao">
@@ -105,16 +105,16 @@
     </form>
 
     <form id="form-link" class="painel" role="tabpanel" aria-labelledby="aba-link" novalidate hidden>
-      <div class="campo-topo">
-        <label for="link">Cole aqui o link (o endereço do site)</label>
+      <label for="link">Cole aqui o link (o endereço do site)</label>
+      <input id="link" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="campo-acoes">
         <button type="button" id="colar-link" class="colar"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2h6a1 1 0 0 1 1 1v1h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V3a1 1 0 0 1 1-1Zm1 2v2h4V4ZM6 6v14h12V6h-2v1a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V6Z" fill="currentColor"/></svg>Colar link</button>
       </div>
-      <input id="link" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false">
-      <div class="campo-topo">
-        <label for="anuncio">Ou cole o texto do anúncio ou da oferta</label>
+      <label for="anuncio">Ou cole o texto do anúncio ou da oferta</label>
+      <textarea id="anuncio" rows="5" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+      <div class="campo-acoes">
         <button type="button" id="colar-anuncio" class="colar"><svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2h6a1 1 0 0 1 1 1v1h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V3a1 1 0 0 1 1-1Zm1 2v2h4V4ZM6 6v14h12V6h-2v1a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V6Z" fill="currentColor"/></svg>Colar anúncio</button>
       </div>
-      <textarea id="anuncio" rows="5" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
       <button type="submit" class="conferir">Conferir<svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.3 5.3a1 1 0 0 1 1.4 0l6 6a1 1 0 0 1 0 1.4l-6 6a1 1 0 1 1-1.4-1.4l4.3-4.3H4a1 1 0 1 1 0-2h13.6l-4.3-4.3a1 1 0 0 1 0-1.4Z" fill="currentColor"/></svg></button>
       <p class="nota">O link não é aberto: só o endereço é comparado com os das lojas conhecidas, aqui no seu celular. Veja também a lista <a href="https://sistemas.procon.sp.gov.br/evitesite/list/evitesites.php" rel="noopener noreferrer">"Evite esses Sites" do Procon-SP</a>. Não estar na lista não quer dizer nada: ela é pequena.</p>
     </form>

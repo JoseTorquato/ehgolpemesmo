@@ -326,18 +326,11 @@ input:focus {
   border-color: var(--primario);
 }
 
-.campo-topo {
+/* "Colar": logo abaixo do campo, à direita (ordem: rótulo, campo, Colar, Conferir) */
+.campo-acoes {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 0 0.8rem;
-  margin-top: 1.2rem;
-}
-
-.campo-topo label {
-  flex: 1 1 8rem;
-  margin: 0 0 0.4rem;
+  justify-content: flex-end;
+  margin-top: 0.4rem;
 }
 
 /* ---- botões ---- */
@@ -364,7 +357,7 @@ button,
 /* a ação principal: grande, amarela, uma por formulário */
 .conferir {
   width: 100%;
-  margin-top: 1.6rem;
+  margin-top: 1.2rem;
   min-height: 3.4rem;
   font-size: 1.2rem;
   background: var(--acao);
@@ -388,7 +381,6 @@ button,
   color: var(--secundario-texto);
   border-color: var(--linha);
   font-size: 0.9rem;
-  margin-bottom: 0.4rem;
 }
 
 .colar:hover {
@@ -865,15 +857,6 @@ footer a {
 }
 
 @media (max-width: 39.99rem) {
-  /* rótulo em linha inteira; "Colar" à direita, logo abaixo dele */
-  .campo-topo label {
-    flex-basis: 100%;
-  }
-
-  .campo-topo .colar {
-    margin-left: auto;
-  }
-
   /* cartões de navegação: ícone maior, alinhado ao título */
   .atalho {
     align-items: flex-start;
