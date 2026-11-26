@@ -40,6 +40,25 @@ const CENARIOS = [
   },
 ];
 
+// Menor letra entre os elementos com texto visível, e menor botão ou link-botão.
+const MEDIR_MINIMOS = `(() => {
+  let letra = Infinity, ondeLetra = "", botao = Infinity, ondeBotao = "";
+  for (const el of document.querySelectorAll("body *")) {
+    if (!el.offsetParent || el.closest(".pular, svg")) continue;
+    const temTexto = [...el.childNodes].some((n) => n.nodeType === 3 && n.data.trim());
+    if (temTexto) {
+      const px = parseFloat(getComputedStyle(el).fontSize);
+      if (px < letra) { letra = px; ondeLetra = el.tagName.toLowerCase() + (el.className ? "." + el.className : ""); }
+    }
+  }
+  for (const b of document.querySelectorAll("button, .botao-link")) {
+    if (!b.offsetParent) continue;
+    const h = b.getBoundingClientRect().height;
+    if (h < botao) { botao = h; ondeBotao = b.id || b.className; }
+  }
+  return { letra, ondeLetra, botao: Math.round(botao * 10) / 10, ondeBotao };
+})()`;
+
 // Conta palavras do conteúdo que começam numa linha e terminam em outra.
 // "com hífen": a quebra cai num hífen que já está na palavra (e-mail);
 // "sem hífen": a palavra foi partida no meio das letras.
@@ -145,12 +164,14 @@ for (const { pagina, nome, js } of CENARIOS) {
       await esperar(300);
       const m = await avaliar("({ s: document.documentElement.scrollWidth, c: document.documentElement.clientWidth })");
       const q = await avaliar(CONTAR_QUEBRADAS);
+      const mn = await avaliar(MEDIR_MINIMOS);
       const ok = m.s <= m.c;
       if (!ok) falhas++;
       console.log(
         `${ok ? "ok  " : "ROLA"} ${nome.padEnd(18)} ${largura}px texto ${escala * 100}%: scrollWidth ${m.s} / largura ${m.c}` +
           ` · palavras partidas: ${q.n} (no hífen da palavra: ${q.comHifen}; no meio: ${q.semHifen}` +
-          `${q.exemplos.length ? ` — ${q.exemplos.join(", ")}` : ""})`,
+          `${q.exemplos.length ? ` — ${q.exemplos.join(", ")}` : ""})` +
+          ` · menor letra ${mn.letra}px (${mn.ondeLetra}) · menor botão ${mn.botao}px (${mn.ondeBotao})`,
       );
     }
   }
